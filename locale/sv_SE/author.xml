@@ -32,7 +32,7 @@
 	<message key="author.submit.confirmation">Bekräfta</message>
 	<message key="author.submit.nextSteps">Följande steg</message>
 	<message key="submission.submit.cancelSubmission">Du kan fortsätta vid ett senare tillfälle genom att gå in på Aktuella bidrag under författarens Min sida.</message>
-	<message key="author.submit.notAccepting">Den här tidskriften tar för tillfället inte emot några bidrag.</message>
+	<message key="author.submit.notAccepting">Den här konferensen tar för tillfället inte emot några bidrag.</message>
 	<message key="author.submit.requestWaiver">Begär avgiftsfri publicering</message>
 	<message key="author.submit.qualifyForWaiver">Vänligen överväg avgiftsfri publicering för den här artikeln</message>
 	<message key="author.submit.addReasonsForWaiver">Använd kommentarsfältet nedan för att förklara varför avgiftsfri publicering bör övervägas.</message>
@@ -46,16 +46,16 @@
 	<message key="author.submissions.confirmDelete">Är du säker på att du vill ta bort den påbörjade inlämningen?</message>
 	<message key="author.submissions.viewStatus">Se status</message>
 	<message key="author.submissions.noSubmissions">Inga bidrag.</message>
-	<message key="author.submit.journalSection">Tidskriftssektion</message>
-	<message key="author.submit.journalSectionDescription">Artiklar måste skickas in till en av tidskriftens sektioner.</message>
+	<message key="author.submit.journalSection">Konferenssektioner</message>
+	<message key="author.submit.journalSectionDescription">Konferensbidragen måste skickas in till en av konferensens sektioner som t.ex. teman, ämnen eller sessioner.</message>
 	<message key="author.submit.verifyChecklist">Alla moment i checklistan för insändning av bidrag måste vara genomförda innan du kan fortsätta.</message>
-	<message key="author.submit.copyrightNoticeAgree">Författarna samtycker till upphovsrättsvillkoren som kommer att gälla för bidraget om och när det publiceras av tidskriften. (Kommentarer till redaktören kan lämnas nedan).</message>
+	<message key="author.submit.copyrightNoticeAgree">Författarna samtycker till upphovsrättsvillkoren som kommer att gälla för bidraget om och när det publiceras av konferensen. (Kommentarer till redaktören kan lämnas nedan).</message>
 	<message key="author.submit.copyrightNoticeAgreeRequired">Godkännande av upphovsrättsvillkoren krävs innan du kan fortsätta.</message>
 	<message key="submission.submit.coverNote">Kommentarer till redaktören</message>
 	<message key="author.submit.comments">Fyll i text (frivilligt)</message>
-	<message key="author.submit.form.sectionRequired">Välj en lämplig tidskriftssektion för detta bidrag.</message>
+	<message key="author.submit.form.sectionRequired">Välj en lämplig sektion/session/tema för detta bidrag.</message>
 	<message key="author.submit.form.localeRequired">Ange språk för bidraget.</message>
-	<message key="submission.submit.privacyStatement">Tidskriftens sekretessdeklaration</message>
+	<message key="submission.submit.privacyStatement">Konferensens sekretessdeklaration</message>
 	<message key="author.submit.reorderInstructions">Sortera författarna i den ordning de ska listas i publikationen.</message>
 	<message key="author.submit.reorder">Sortera om författarnamn</message>
 	<message key="author.submit.selectPrincipalContact">Primär kontaktperson för redaktionell korrespondens.</message>
@@ -68,7 +68,7 @@
 	<message key="author.submit.form.authorRequiredFields">För-, efternamn och e-postadress för varje författare krävs.</message>
 	<message key="author.submit.form.titleRequired">Titel krävs.</message>
 	<message key="author.submit.form.abstractRequired">Abstract krävs.</message>
-	<message key="author.submit.form.wordCountAlert">Du har överskridit max antal ord för abstracts i den här tidskriftssektionen.</message>
+	<message key="author.submit.form.wordCountAlert">Du har överskridit max antal ord för abstracts.</message>
 	<message key="author.submit.submissionFile">Bidragsfil</message>
 	<message key="author.submit.uploadSubmissionFile">Ladda upp bidragsfil</message>
 	<message key="author.submit.replaceSubmissionFile">Ersätt uppladdad bidragsfil</message>
@@ -106,7 +106,7 @@
 	<message key="author.submit.suppFile.form.descriptionRequired">Beskrivning krävs.</message>
 	<message key="author.suppFile.suppFilePublicIdentificationExists">Identifikator för publik kompletterande finns redan.</message>
 	<message key="author.suppFile.publicSuppFileIdentifier">Identifikator för publik kompletterande fil</message>
-	<message key="author.submit.confirmationDescription">För att skicka in bidraget till {$journalTitle} klicka på Skicka in bidrag. Den primära kontaktpersonen för bidraget kommer få en bekräftelse med e-post och kommer att kunna följa bidragets väg genom den redaktionella processen genom att logga in på tidskriftens webbplats. Tack för att du är intresserad av att publicera i {$journalTitle}.</message>
+	<message key="author.submit.confirmationDescription">För att skicka in bidraget till {$journalTitle} klicka på Skicka in bidrag. Den primära kontaktpersonen för bidraget kommer få en bekräftelse med e-post och kommer att kunna följa bidragets väg genom den redaktionella processen genom att logga in på konferensens webbplats. Tack för att du är intresserad av att publicera i {$journalTitle}.</message>
 	<message key="author.submit.noFiles">Inga filer har laddats upp till det här bidraget.</message>
 	<message key="author.submit.filesSummary">Sammanfattning av filer</message>
 	<message key="author.submit.finishSubmission">Skicka in bidrag</message>
@@ -114,5 +114,5 @@
 	<message key="author.article.uploadAuthorVersion">Ladda upp författarversion</message>
 	<message key="author.article.copyeditedFile">Manusredigerad fil</message>
 	<message key="author.article.authorRevisedFile">Författarfil</message>
-	<message key="author.submit.authorSubmitLoginMessage">Ett användarkonto krävs för att skicka in bidrag till den här tidskriften. Detta möjliggör för våra granskare att följa ditt bidrag och kontakta dig när status på inskickat bidrag förändras, eller om ytterligare information behövs av dig.</message>
+	<message key="author.submit.authorSubmitLoginMessage">Ett användarkonto krävs för att skicka in bidrag till den här konferensen. Detta möjliggör för våra granskare att följa ditt bidrag och kontakta dig när status på inskickat bidrag förändras, eller om ytterligare information behövs av dig.</message>
 </locale>

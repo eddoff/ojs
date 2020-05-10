@@ -36,7 +36,7 @@ Reset my password: {$url}<br />
 	</email_text>
 	<email_text key="PASSWORD_RESET">
 		<subject>Password Reset</subject>
-		<body><![CDATA[Your password has been successfully reset for use with the {$siteTitle} web site. Please retain this username and password, as it is necessary for all work with the journal.<br />
+		<body><![CDATA[Your password has been successfully reset for use with the {$siteTitle} web site. Please retain this username and password, as it is necessary for all work with the conference.<br />
 <br />
 Your username: {$username}<br />
 Password: {$password}<br />
@@ -45,10 +45,10 @@ Password: {$password}<br />
 		<description>This email is sent to a registered user when they have successfully reset their password following the process described in the PASSWORD_RESET_CONFIRM email.</description>
 	</email_text>
 	<email_text key="USER_REGISTER">
-		<subject>Journal Registration</subject>
+		<subject>Conference Registration</subject>
 		<body><![CDATA[{$userFullName}<br />
 <br />
-You have now been registered as a user with {$contextName}. We have included your username and password in this email, which are needed for all work with this journal through its website. At any point, you can ask to be removed from the journal's list of users by contacting me.<br />
+You have now been registered as a user with {$contextName}. We have included your username and password in this email, which are needed for all work with this conference through its website. At any point, you can ask to be removed from the conference's list of users by contacting me.<br />
 <br />
 Username: {$username}<br />
 Password: {$password}<br />
@@ -73,7 +73,7 @@ Thank you,<br />
 		<subject>Registration as Reviewer with {$contextName}</subject>
 		<body><![CDATA[In light of your expertise, we have taken the liberty of registering your name in the reviewer database for {$contextName}. This does not entail any form of commitment on your part, but simply enables us to approach you with a submission to possibly review. On being invited to review, you will have an opportunity to see the title and abstract of the paper in question, and you'll always be in a position to accept or decline the invitation. You can also ask at any point to have your name removed from this reviewer list.<br />
 <br />
-We are providing you with a username and password, which is used in all interactions with the journal through its website. You may wish, for example, to update your profile, including your reviewing interests.<br />
+We are providing you with a username and password, which is used in all interactions with the conference through its website. You may wish, for example, to update your profile, including your reviewing interests.<br />
 <br />
 Username: {$username}<br />
 Password: {$password}<br />
@@ -90,53 +90,53 @@ Thank you,<br />
 <br />
 Thanks for the continuing interest in our work,<br />
 {$editorialContactSignature}]]></body>
-		<description>This email is sent to registered readers via the "Notify Users" link in the Editor's User Home. It notifies readers of a new issue and invites them to visit the journal at a supplied URL.</description>
+		<description>This email is sent to registered readers via the "Notify Users" link in the Editor's User Home. It notifies readers of a new issue and invites them to visit the conference at a supplied URL.</description>
 	</email_text>
 	<email_text key="LOCKSS_EXISTING_ARCHIVE">
 		<subject>Archiving Request for {$contextName}</subject>
 		<body><![CDATA[Dear [University Librarian]<br />
 <br />
-{$contextName} &amp;lt;{$contextUrl}&amp;gt;, is a journal for which a member of your faculty, [name of member], serves as a [title of position]. The journal is seeking to establish a LOCKSS (Lots of Copies Keep Stuff Safe) compliant archive with this and other university libraries.<br />
+{$contextName} &amp;lt;{$contextUrl}&amp;gt;, is a conference for which a member of your faculty, [name of member], serves as a [title of position]. The conference is seeking to establish a LOCKSS (Lots of Copies Keep Stuff Safe) compliant archive with this and other university libraries.<br />
 <br />
-[Brief description of journal]<br />
+[Brief description of conference]<br />
 <br />
-The URL to the LOCKSS Publisher Manifest for our journal is: {$contextUrl}/gateway/lockss<br />
+The URL to the LOCKSS Publisher Manifest for our conference is: {$contextUrl}/gateway/lockss<br />
 <br />
-We understand that you are already participating in LOCKSS. If we can provide any additional metadata for purposes of registering our journal with your version of LOCKSS, we would be happy to provide it.<br />
+We understand that you are already participating in LOCKSS. If we can provide any additional metadata for purposes of registering our conference with your version of LOCKSS, we would be happy to provide it.<br />
 <br />
 Thank you,<br />
 {$principalContactSignature}]]></body>
-		<description>This email requests the keeper of a LOCKSS archive to consider including this journal in their archive. It provides the URL to the journal's LOCKSS Publisher Manifest.</description>
+		<description>This email requests the keeper of a LOCKSS archive to consider including this conference in their archive. It provides the URL to the conference's LOCKSS Publisher Manifest.</description>
 	</email_text>
 	<email_text key="LOCKSS_NEW_ARCHIVE">
 		<subject>Archiving Request for {$contextName}</subject>
 		<body><![CDATA[Dear [University Librarian]<br />
 <br />
-{$contextName} &amp;lt;{$contextUrl}&amp;gt;, is a journal for which a member of your faculty, [name of member] serves as a [title of position]. The journal is seeking to establish a LOCKSS (Lots of Copies Keep Stuff Safe) compliant archive with this and other university libraries.<br />
+{$contextName} &amp;lt;{$contextUrl}&amp;gt;, is a conference for which a member of your faculty, [name of member] serves as a [title of position]. The conference is seeking to establish a LOCKSS (Lots of Copies Keep Stuff Safe) compliant archive with this and other university libraries.<br />
 <br />
-[Brief description of journal]<br />
+[Brief description of conference]<br />
 <br />
 The LOCKSS Program &amp;lt;http://lockss.org/&amp;gt;, an international library/publisher initiative, is a working example of a distributed preservation and archiving repository, additional details are below. The software, which runs on an ordinary personal computer is free; the system is easily brought on-line; very little ongoing maintenance is required.<br />
 <br />
-To assist in the archiving of our journal, we invite you to become a member of the LOCKSS community, to help collect and preserve titles produced by your faculty and by other scholars worldwide. To do so, please have someone on your staff visit the LOCKSS site for information on how this system operates. I look forward to hearing from you on the feasibility of providing this archiving support for this journal.<br />
+To assist in the archiving of our conference, we invite you to become a member of the LOCKSS community, to help collect and preserve titles produced by your faculty and by other scholars worldwide. To do so, please have someone on your staff visit the LOCKSS site for information on how this system operates. I look forward to hearing from you on the feasibility of providing this archiving support for this conference.<br />
 <br />
 Thank you,<br />
 {$principalContactSignature}]]></body>
-		<description>This email encourages the recipient to participate in the LOCKSS initiative and include this journal in the archive. It provides information about the LOCKSS initiative and ways to become involved.</description>
+		<description>This email encourages the recipient to participate in the LOCKSS initiative and include this conference in the archive. It provides information about the LOCKSS initiative and ways to become involved.</description>
 	</email_text>
 	<email_text key="SUBMISSION_ACK">
 		<subject>Submission Acknowledgement</subject>
 		<body><![CDATA[{$authorName}:<br />
 <br />
-Thank you for submitting the manuscript, &quot;{$submissionTitle}&quot; to {$contextName}. With the online journal management system that we are using, you will be able to track its progress through the editorial process by logging in to the journal web site:<br />
+Thank you for submitting the manuscript, &quot;{$submissionTitle}&quot; to {$contextName}. With the online conference management system that we are using, you will be able to track its progress through the editorial process by logging in to the conference web site:<br />
 <br />
 Submission URL: {$submissionUrl}<br />
 Username: {$authorUsername}<br />
 <br />
-If you have any questions, please contact me. Thank you for considering this journal as a venue for your work.<br />
+If you have any questions, please contact me. Thank you for considering this conference as a venue for your work.<br />
 <br />
 {$editorialContactSignature}]]></body>
-		<description>This email, when enabled, is automatically sent to an author when he or she completes the process of submitting a manuscript to the journal. It provides information about tracking the submission through the process and thanks the author for the submission.</description>
+		<description>This email, when enabled, is automatically sent to an author when he or she completes the process of submitting a manuscript to the conference. It provides information about tracking the submission through the process and thanks the author for the submission.</description>
 	</email_text>
 	<email_text key="SUBMISSION_ACK_NOT_USER">
 		<subject>Submission Acknowledgement</subject>
@@ -144,7 +144,7 @@ If you have any questions, please contact me. Thank you for considering this jou
 <br />
 {$submitterName} has submitted the manuscript, &quot;{$submissionTitle}&quot; to {$contextName}. <br />
 <br />
-If you have any questions, please contact me. Thank you for considering this journal as a venue for your work.<br />
+If you have any questions, please contact me. Thank you for considering this conference as a venue for your work.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>This email, when enabled, is automatically sent to the other authors who are not users within OJS specified during the submission process.</description>
@@ -160,7 +160,7 @@ Username: {$editorUsername}<br />
 <br />
 Thank you,<br />
 {$editorialContactSignature}]]></body>
-		<description>This email notifies a Section Editor that the Editor has assigned them the task of overseeing a submission through the editing process. It provides information about the submission and how to access the journal site.</description>
+		<description>This email notifies a Section Editor that the Editor has assigned them the task of overseeing a submission through the editing process. It provides information about the submission and how to access the conference site.</description>
 	</email_text>
 	<email_text key="REVIEW_REQUEST">
 		<subject>Article Review Request</subject>
@@ -168,11 +168,11 @@ Thank you,<br />
 <br />
 I believe that you would serve as an excellent reviewer of the manuscript, &quot;{$submissionTitle},&quot; which has been submitted to {$contextName}. The submission's abstract is inserted below, and I hope that you will consider undertaking this important task for us.<br />
 <br />
-Please log into the journal web site by {$responseDueDate} to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation. The web site is {$contextUrl}<br />
+Please log into the conference web site by {$responseDueDate} to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation. The web site is {$contextUrl}<br />
 <br />
 The review itself is due {$reviewDueDate}.<br />
 <br />
-If you do not have your username and password for the journal's web site, you can use this link to reset your password (which will then be emailed to you along with your username). {$passwordResetUrl}<br />
+If you do not have your username and password for the conference's web site, you can use this link to reset your password (which will then be emailed to you along with your username). {$passwordResetUrl}<br />
 <br />
 Submission URL: {$submissionReviewUrl}<br />
 <br />
@@ -192,11 +192,11 @@ Just a gentle reminder of our request for your review of the submission, &quot;{
 <br />
 I believe that you would serve as an excellent reviewer of the manuscript. The submission's abstract is inserted below, and I hope that you will consider undertaking this important task for us.<br />
 <br />
-Please log into the journal web site to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation. The web site is {$contextUrl}<br />
+Please log into the conference web site to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation. The web site is {$contextUrl}<br />
 <br />
 The review itself is due {$reviewDueDate}.<br />
 <br />
-If you do not have your username and password for the journal's web site, you can use this link to reset your password (which will then be emailed to you along with your username). {$passwordResetUrl}<br />
+If you do not have your username and password for the conference's web site, you can use this link to reset your password (which will then be emailed to you along with your username). {$passwordResetUrl}<br />
 <br />
 Submission URL: {$submissionReviewUrl}<br />
 <br />
@@ -215,7 +215,7 @@ Thank you for considering this request.<br />
 <br />
 I believe that you would serve as an excellent reviewer of the manuscript, &quot;{$submissionTitle},&quot; which has been submitted to {$contextName}. The submission's abstract is inserted below, and I hope that you will consider undertaking this important task for us.<br />
 <br />
-Please log into the journal web site by {$responseDueDate} to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation.<br />
+Please log into the conference web site by {$responseDueDate} to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation.<br />
 <br />
 The review itself is due {$reviewDueDate}.<br />
 <br />
@@ -237,7 +237,7 @@ Just a gentle reminder of our request for your review of the submission, &quot;{
 <br />
 I believe that you would serve as an excellent reviewer of the manuscript. The submission's abstract is inserted below, and I hope that you will consider undertaking this important task for us.<br />
 <br />
-Please log into the journal web site to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation.<br />
+Please log into the conference web site to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation.<br />
 <br />
 The review itself is due {$reviewDueDate}.<br />
 <br />
@@ -256,7 +256,7 @@ Thank you for considering this request.<br />
 		<subject>Article Review Request</subject>
 		<body><![CDATA[{$reviewerName}:<br />
 <br />
-I believe that you would serve as an excellent reviewer of the manuscript, &quot;{$submissionTitle},&quot; and I am asking that you consider undertaking this important task for us. The Review Guidelines for this journal are appended below, and the submission is attached to this email. Your review of the submission, along with your recommendation, should be emailed to me by {$reviewDueDate}.<br />
+I believe that you would serve as an excellent reviewer of the manuscript, &quot;{$submissionTitle},&quot; and I am asking that you consider undertaking this important task for us. The Review Guidelines for this conference are appended below, and the submission is attached to this email. Your review of the submission, along with your recommendation, should be emailed to me by {$reviewDueDate}.<br />
 <br />
 Please indicate in a return email by {$responseDueDate} whether you are able and willing to do the review.<br />
 <br />
@@ -279,11 +279,11 @@ This regards the manuscript &quot;{$submissionTitle},&quot; which is under consi
 <br />
 Following the review of the previous version of the manuscript, the authors have now submitted a revised version of their paper. We would appreciate it if you could help evaluate it.<br />
 <br />
-Please log into the journal web site by {$responseDueDate} to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation. The web site is {$contextUrl}<br />
+Please log into the conference web site by {$responseDueDate} to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation. The web site is {$contextUrl}<br />
 <br />
 The review itself is due {$reviewDueDate}.<br />
 <br />
-If you do not have your username and password for the journal's web site, you can use this link to reset your password (which will then be emailed to you along with your username). {$passwordResetUrl}<br />
+If you do not have your username and password for the conference's web site, you can use this link to reset your password (which will then be emailed to you along with your username). {$passwordResetUrl}<br />
 <br />
 Submission URL: {$submissionReviewUrl}<br />
 <br />
@@ -304,7 +304,7 @@ This regards the manuscript &quot;{$submissionTitle},&quot; which is under consi
 <br />
 Following the review of the previous version of the manuscript, the authors have now submitted a revised version of their paper. We would appreciate it if you could help evaluate it.<br />
 <br />
-Please log into the journal web site by {$responseDueDate} to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation.<br />
+Please log into the conference web site by {$responseDueDate} to indicate whether you will undertake the review or not, as well as to access the submission and to record your review and recommendation.<br />
 <br />
 The review itself is due {$reviewDueDate}.<br />
 <br />
@@ -327,7 +327,7 @@ This regards the manuscript &quot;{$submissionTitle},&quot; which is under consi
 <br />
 Following the review of the previous version of the manuscript, the authors have now submitted a revised version of their paper. We would appreciate it if you could help evaluate it.<br />
 <br />
-The Review Guidelines for this journal are appended below, and the submission is attached to this email. Your review of the submission, along with your recommendation, should be emailed to me by {$reviewDueDate}.<br />
+The Review Guidelines for this conference are appended below, and the submission is attached to this email. Your review of the submission, along with your recommendation, should be emailed to me by {$reviewDueDate}.<br />
 <br />
 Please indicate in a return email by {$responseDueDate} whether you are able and willing to do the review.<br />
 <br />
@@ -346,7 +346,7 @@ Review Guidelines<br />
 		<subject>Request for Review Cancelled</subject>
 		<body><![CDATA[{$reviewerName}:<br />
 <br />
-We have decided at this point to cancel our request for you to review the submission, &quot;{$submissionTitle},&quot; for {$contextName}. We apologize for any inconvenience this may cause you and hope that we will be able to call on you to assist with this journal's review process in the future.<br />
+We have decided at this point to cancel our request for you to review the submission, &quot;{$submissionTitle},&quot; for {$contextName}. We apologize for any inconvenience this may cause you and hope that we will be able to call on you to assist with this conference's review process in the future.<br />
 <br />
 If you have any questions, please contact me.<br />
 <br />
@@ -386,11 +386,11 @@ Thank you for completing the review of the submission, &quot;{$submissionTitle},
 <br />
 Just a gentle reminder of our request for your review of the submission, &quot;{$submissionTitle},&quot; for {$contextName}. We were hoping to have this review by {$reviewDueDate}, and would be pleased to receive it as soon as you are able to prepare it.<br />
 <br />
-If you do not have your username and password for the journal's web site, you can use this link to reset your password (which will then be emailed to you along with your username). {$passwordResetUrl}<br />
+If you do not have your username and password for the conference's web site, you can use this link to reset your password (which will then be emailed to you along with your username). {$passwordResetUrl}<br />
 <br />
 Submission URL: {$submissionReviewUrl}<br />
 <br />
-Please confirm your ability to complete this vital contribution to the work of the journal. I look forward to hearing from you.<br />
+Please confirm your ability to complete this vital contribution to the work of the conference. I look forward to hearing from you.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>This email is sent by a Section Editor to remind a reviewer that their review is due.</description>
@@ -403,7 +403,7 @@ Just a gentle reminder of our request for your review of the submission, &quot;{
 <br />
 Submission URL: {$submissionReviewUrl}<br />
 <br />
-Please confirm your ability to complete this vital contribution to the work of the journal. I look forward to hearing from you.<br />
+Please confirm your ability to complete this vital contribution to the work of the conference. I look forward to hearing from you.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>This email is sent by a Section Editor to remind a reviewer that their review is due.</description>
@@ -414,11 +414,11 @@ Please confirm your ability to complete this vital contribution to the work of t
 <br />
 Just a gentle reminder of our request for your review of the submission, &quot;{$submissionTitle},&quot; for {$contextName}. We were hoping to have this review by {$reviewDueDate}, and this email has been automatically generated and sent with the passing of that date. We would still be pleased to receive it as soon as you are able to prepare it.<br />
 <br />
-If you do not have your username and password for the journal's web site, you can use this link to reset your password (which will then be emailed to you along with your username). {$passwordResetUrl}<br />
+If you do not have your username and password for the conference's web site, you can use this link to reset your password (which will then be emailed to you along with your username). {$passwordResetUrl}<br />
 <br />
 Submission URL: {$submissionReviewUrl}<br />
 <br />
-Please confirm your ability to complete this vital contribution to the work of the journal. I look forward to hearing from you.<br />
+Please confirm your ability to complete this vital contribution to the work of the conference. I look forward to hearing from you.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>This email is automatically sent when a reviewer's due date elapses (see Review Options under Settings &gt; Workflow &gt; Review) and one-click reviewer access is disabled. Scheduled tasks must be enabled and configured (see the site configuration file).</description>
@@ -431,7 +431,7 @@ Just a gentle reminder of our request for your review of the submission, &quot;{
 <br />
 Submission URL: {$submissionReviewUrl}<br />
 <br />
-Please confirm your ability to complete this vital contribution to the work of the journal. I look forward to hearing from you.<br />
+Please confirm your ability to complete this vital contribution to the work of the conference. I look forward to hearing from you.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>This email is automatically sent when a reviewer's due date elapses (see Review Options under Settings &gt; Workflow &gt; Review) and one-click reviewer access is enabled. Scheduled tasks must be enabled and configured (see the site configuration file).</description>
@@ -543,7 +543,7 @@ Username: {$participantUsername}<br />
 <br />
 The submission &quot;{$submissionTitle}&quot; to {$contextName} now needs galleys laid out by following these steps.<br />
 1. Click on the Submission URL below.<br />
-2. Log into the journal and use the Production Ready files to create the galleys according to the journal's standards.<br />
+2. Log into the conference and use the Production Ready files to create the galleys according to the conference's standards.<br />
 3. Upload the galleys to the Galley Files section.<br />
 4. Notify the Editor using Production Discussions that the galleys are uploaded and ready.<br />
 <br />
@@ -551,7 +551,7 @@ The submission &quot;{$submissionTitle}&quot; to {$contextName} now needs galley
 Submission URL: {$submissionLayoutUrl}<br />
 Username: {$participantUsername}<br />
 <br />
-If you are unable to undertake this work at this time or have any questions, please contact me. Thank you for your contribution to this journal.<br />
+If you are unable to undertake this work at this time or have any questions, please contact me. Thank you for your contribution to this conference.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>This email from the Section Editor to the Layout Editor notifies them that they have been assigned the task of performing layout editing on a submission. It provides information about the submission and how to access it.</description>
@@ -570,13 +570,13 @@ If you have any questions, please contact me.<br />
 	<email_text key="EMAIL_LINK">
 		<subject>Article of Possible Interest</subject>
 		<body><![CDATA[Thought you might be interested in seeing &quot;{$submissionTitle}&quot; by {$authorName} published in Vol {$volume}, No {$number} ({$year}) of {$contextName} at &quot;{$articleUrl}&quot;.]]></body>
-		<description>This email template provides a registered reader with the opportunity to send information about an article to somebody who may be interested. It is available via the Reading Tools and must be enabled by the Journal Manager in the Reading Tools Administration page.</description>
+		<description>This email template provides a registered reader with the opportunity to send information about an article to somebody who may be interested. It is available via the Reading Tools and must be enabled by the Conference Manager in the Reading Tools Administration page.</description>
 	</email_text>
 	<email_text key="SUBSCRIPTION_NOTIFY">
 		<subject>Subscription Notification</subject>
 		<body><![CDATA[{$subscriberName}:<br />
 <br />
-You have now been registered as a subscriber in our online journal management system for {$contextName}, with the following subscription:<br />
+You have now been registered as a subscriber in our online conference management system for {$contextName}, with the following subscription:<br />
 <br />
 {$subscriptionType}<br />
 <br />
@@ -589,7 +589,7 @@ Please note that if you have an institutional subscription, there is no need for
 If you have any questions, please feel free to contact me.<br />
 <br />
 {$subscriptionContactSignature}]]></body>
-		<description>This email notifies a registered reader that the Manager has created a subscription for them. It provides the journal's URL along with instructions for access.</description>
+		<description>This email notifies a registered reader that the Manager has created a subscription for them. It provides the conference's URL along with instructions for access.</description>
 	</email_text>
 	<email_text key="OPEN_ACCESS_NOTIFY">
 		<subject>Issue Now Open Access</subject>
@@ -610,12 +610,12 @@ Your {$contextName} subscription is about to expire.<br />
 {$subscriptionType}<br />
 Expiry date: {$expiryDate}<br />
 <br />
-To ensure the continuity of your access to this journal, please go to the journal website and renew your subscription. You are able to log in to the system with your username, &quot;{$username}&quot;.<br />
+To ensure the continuity of your access to this conference, please go to the conference website and renew your subscription. You are able to log in to the system with your username, &quot;{$username}&quot;.<br />
 <br />
 If you have any questions, please feel free to contact me.<br />
 <br />
 {$subscriptionContactSignature}]]></body>
-		<description>This email notifies a subscriber that their subscription will soon expire. It provides the journal's URL along with instructions for access.</description>
+		<description>This email notifies a subscriber that their subscription will soon expire. It provides the conference's URL along with instructions for access.</description>
 	</email_text>
 	<email_text key="SUBSCRIPTION_AFTER_EXPIRY">
 		<subject>Subscription Expired</subject>
@@ -626,12 +626,12 @@ Your {$contextName} subscription has expired.<br />
 {$subscriptionType}<br />
 Expiry date: {$expiryDate}<br />
 <br />
-To renew your subscription, please go to the journal website. You are able to log in to the system with your username, &quot;{$username}&quot;.<br />
+To renew your subscription, please go to the conference website. You are able to log in to the system with your username, &quot;{$username}&quot;.<br />
 <br />
 If you have any questions, please feel free to contact me.<br />
 <br />
 {$subscriptionContactSignature}]]></body>
-		<description>This email notifies a subscriber that their subscription has expired. It provides the journal's URL along with instructions for access.</description>
+		<description>This email notifies a subscriber that their subscription has expired. It provides the conference's URL along with instructions for access.</description>
 	</email_text>
 	<email_text key="SUBSCRIPTION_AFTER_EXPIRY_LAST">
 		<subject>Subscription Expired - Final Reminder</subject>
@@ -643,12 +643,12 @@ Please note that this is the final reminder that will be emailed to you.<br />
 {$subscriptionType}<br />
 Expiry date: {$expiryDate}<br />
 <br />
-To renew your subscription, please go to the journal website. You are able to log in to the system with your username, &quot;{$username}&quot;.<br />
+To renew your subscription, please go to the conference website. You are able to log in to the system with your username, &quot;{$username}&quot;.<br />
 <br />
 If you have any questions, please feel free to contact me.<br />
 <br />
 {$subscriptionContactSignature}]]></body>
-		<description>This email notifies a subscriber that their subscription has expired. It provides the journal's URL along with instructions for access.</description>
+		<description>This email notifies a subscriber that their subscription has expired. It provides the conference's URL along with instructions for access.</description>
 	</email_text>
 	<email_text key="SUBSCRIPTION_PURCHASE_INDL">
 		<subject>Subscription Purchase: Individual</subject>

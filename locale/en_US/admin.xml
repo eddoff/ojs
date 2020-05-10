@@ -12,17 +12,17 @@
   -->
 
 <locale name="en_US" full_name="U.S. English">
-	<message key="admin.hostedJournals">Hosted Journals</message>
-	<message key="admin.settings.journalRedirect">Journal redirect</message>
+	<message key="admin.hostedJournals">Hosted Conferences</message>
+	<message key="admin.settings.journalRedirect">Conference redirect</message>
 	<message key="admin.settings.options">Options</message>
-	<message key="admin.settings.journalRedirectInstructions">Requests to the main site will be redirected to this journal. This may be useful if the site is hosting only a single journal, for example.</message>
+	<message key="admin.settings.journalRedirectInstructions">Requests to the main site will be redirected to this conference. This may be useful if the site is hosting only a single conference, for example.</message>
 	<message key="admin.settings.noJournalRedirect">Do not redirect</message>
 	<message key="admin.settings.defaultMetricDescription">
 		Your OJS installation is configured to record more than one usage metric. Usage statistics will be displayed in several contexts.
 		There are cases where a single usage statistic must be used, e.g. to display an ordered list of most-used articles or to rank
 		search results. Please select one of the configured metrics as a default.
 	</message>
-	<message key="admin.languages.confirmDisable">Are you sure you want to disable this locale? This may affect any hosted journals currently using the locale.</message>
+	<message key="admin.languages.confirmDisable">Are you sure you want to disable this locale? This may affect any hosted conferences currently using the locale.</message>
 	<message key="admin.languages.downloadUnavailable"><![CDATA[<p>Downloading language packs from the Public Knowledge Project web server is not currently available because:</p>
 	<ul>
 		<li>Your server does not have or allow execution of the GNU "tar" utility.</li>
@@ -30,11 +30,11 @@
 	</ul>
 <p>Language packs can be manually downloaded from the <a href="http://pkp.sfu.ca">PKP web site</a>.</p>]]></message>
 
-	<message key="admin.languages.primaryLocaleInstructions">This will be the default language for the site and any hosted journals.</message>
-	<message key="admin.languages.supportedLocalesInstructions">Select all locales to support on the site. The selected locales will be available for use by all journals hosted on the site, and also appear in a language select menu to appear on each site page (which can be overridden on journal-specific pages). If multiple locales are not selected, the language toggle menu will not appear and extended language settings will not be available to journals.</message>
+	<message key="admin.languages.primaryLocaleInstructions">This will be the default language for the site and any hosted conferences.</message>
+	<message key="admin.languages.supportedLocalesInstructions">Select all locales to support on the site. The selected locales will be available for use by all conferences hosted on the site, and also appear in a language select menu to appear on each site page (which can be overridden on conference-specific pages). If multiple locales are not selected, the language toggle menu will not appear and extended language settings will not be available to conferences.</message>
 	<message key="admin.locale.maybeIncomplete">Marked locales may be incomplete.</message>
-	<message key="admin.languages.confirmUninstall">Are you sure you want to uninstall this locale? This may affect any hosted journals currently using the locale.</message>
-	<message key="admin.languages.installNewLocalesInstructions">Select any additional locales to install support for in this system. Locales must be installed before they can be used by hosted journals. See the OJS documentation for information on adding support for new languages.</message>
+	<message key="admin.languages.confirmUninstall">Are you sure you want to uninstall this locale? This may affect any hosted conferences currently using the locale.</message>
+	<message key="admin.languages.installNewLocalesInstructions">Select any additional locales to install support for in this system. Locales must be installed before they can be used by hosted conferences. See the OJS documentation for information on adding support for new languages.</message>
 	<message key="admin.languages.downloadFailed">The locale download failed. The error message(s) below describe the failure.</message>
 	<message key="admin.languages.localeInstalled">The "{$locale}" locale has been installed.</message>
 	<message key="admin.languages.download">Download Locale</message>
@@ -47,18 +47,18 @@
 	<message key="admin.systemVersion">OJS Version</message>
 	<message key="admin.systemConfiguration">OJS Configuration</message>
 	<message key="admin.systemConfigurationDescription"><![CDATA[OJS configuration settings from <tt>config.inc.php</tt>.]]></message>
-	<message key="admin.journals.createInstructions">You will automatically be enrolled as the manager of this journal. After creating a new journal, you will be redirected to its settings wizard, to complete the initial journal setup.</message>
-	<message key="admin.journals.journalSettings">Journal Settings</message>
-	<message key="admin.journals.noneCreated">No journals have been created.</message>
-	<message key="admin.contexts.create">Create Journal</message>
-	<message key="admin.journals.urlWillBe">This should be a single short word or acronym that identifies the journal. The journal's URL will be {$sampleUrl}.</message>
+	<message key="admin.journals.createInstructions">You will automatically be enrolled as the manager of this conference. After creating a new conference, you will be redirected to its settings wizard, to complete the initial conference setup.</message>
+	<message key="admin.journals.journalSettings">Conference Settings</message>
+	<message key="admin.journals.noneCreated">No conferences have been created.</message>
+	<message key="admin.contexts.create">Create Conference</message>
+	<message key="admin.journals.urlWillBe">This should be a single short word or acronym that identifies the conference. The conference's URL will be {$sampleUrl}.</message>
 	<message key="admin.contexts.form.titleRequired">A title is required.</message>
 	<message key="admin.contexts.form.pathRequired">A path is required.</message>
 	<message key="admin.contexts.form.pathAlphaNumeric">The path can contain only alphanumeric characters, underscores, and hyphens, and must begin and end with an alphanumeric character.</message>
-	<message key="admin.contexts.form.pathExists">The selected path is already in use by another journal.</message>
-	<message key="admin.journals.enableJournalInstructions">Enable this journal to appear publicly on the site</message>
-	<message key="admin.journals.journalDescription">Journal description</message>
-	<message key="admin.journal.pathImportInstructions">Existing journal path or path to create (e.g., "ojs").</message>
+	<message key="admin.contexts.form.pathExists">The selected path is already in use by another conference.</message>
+	<message key="admin.journals.enableJournalInstructions">Enable this conference to appear publicly on the site</message>
+	<message key="admin.journals.journalDescription">Conference description</message>
+	<message key="admin.journal.pathImportInstructions">Existing conference path or path to create (e.g., "ojs").</message>
 	<message key="admin.journals.importSubscriptions">Import subscriptions</message>
 	<message key="admin.journals.transcode">Transcode article metadata from ISO8859-1</message>
 	<message key="admin.journals.redirect">Generate code to map OJS 1 URLs to OJS 2 URLs</message>
@@ -74,9 +74,9 @@
 
 	<!-- Categories -->
 	<message key="admin.categories">Categories</message>
-	<message key="admin.categories.enable.description">The Site Administrator may choose to define a set of categories here to help organize large sets of journals. Journal Managers may then choose several of these categories for each journal, and readers can browse journal collections by category.</message>
-	<message key="admin.categories.disableCategories">Do not organise journals into categories.</message>
-	<message key="admin.categories.enableCategories">Permit Journal Managers to organize journals into categories.</message>
+	<message key="admin.categories.enable.description">The Site Administrator may choose to define a set of categories here to help organize large sets of conferences. Conference Managers may then choose several of these categories for each conference, and readers can browse conference collections by category.</message>
+	<message key="admin.categories.disableCategories">Do not organise conferences into categories.</message>
+	<message key="admin.categories.enableCategories">Permit Conference Managers to organize conferences into categories.</message>
 	<message key="admin.categories.editTitle">Edit Category</message>
 	<message key="admin.categories.createTitle">Create Category</message>
 	<message key="admin.categories.create">Create a new Category</message>
@@ -84,7 +84,7 @@
 	<message key="admin.categories.confirmDelete">Are you sure you wish to delete this category?</message>
 	<message key="admin.categories.name">Name</message>
 	<message key="admin.categories.nameRequired">A category name is required.</message>
-	<message key="admin.presses.createInstructions">You will automatically be enrolled as the manager of this journal. After creating a new journal, you will be redirected to its settings wizard, to complete the initial journal setup.</message>
+	<message key="admin.presses.createInstructions">You will automatically be enrolled as the manager of this conference. After creating a new conference, you will be redirected to its settings wizard, to complete the initial conference setup.</message>
 	<message key="admin.scheduledTask.subscriptionExpiryReminder">Subscription Expiry Reminder</message>
 	<message key="admin.scheduledTask.openAccessNotification">Open Access Notification</message>
 	<message key="admin.scheduledTask.reviewReminder">Review Reminder</message>

@@ -22,7 +22,7 @@
 	<message key="editor.allSections">All Sections</message>
 	<message key="editor.allEditors">All Editors</message>
 	<message key="editor.me">Me</message>
-	<message key="editor.publicIdentificationExists">The public identifier '{$publicIdentifier}' already exists for another object (issue, article, galley or file). Please choose unique identifiers within your journal.</message>
+	<message key="editor.publicIdentificationExists">The public identifier '{$publicIdentifier}' already exists for another object (issue, article, galley or file). Please choose unique identifiers within your conference.</message>
 	<message key="editor.submissionArchive.noSubmissions">No submissions in the archive.</message>
 	<message key="editor.submissionArchive.saveChanges">Save changes to archived submissions? Submissions marked for deletion will be permanently deleted from the system.</message>
 	<message key="editor.submissionArchive.confirmDelete">Are you sure you want to permanently delete this submission?</message>
@@ -36,8 +36,8 @@
 	<message key="editor.notifyUsers.allInstitutionalSubscribers">All institutional subscribers ({$count} users)</message>
 	<message key="editor.notifyUsers.inProgress">Notifying users...</message>
 	<message key="editor.usersNotified">Users Notified</message>
-	<message key="editor.notifyUsers.allUsers">Send this message to all users associated with this journal ({$count} users)</message>
-	<message key="editor.notifyUsers.interestedUsers">Send this message to the users associated with this journal who have indicated that they wish to receive updates ({$count} users)</message>
+	<message key="editor.notifyUsers.allUsers">Send this message to all users associated with this conference ({$count} users)</message>
+	<message key="editor.notifyUsers.interestedUsers">Send this message to the users associated with this conference who have indicated that they wish to receive updates ({$count} users)</message>
 	<message key="editor.notifyUsers.includeToc">Include the table of contents from this issue:</message>
 	<message key="editor.editorAdministration">Editor Administration</message>
 	<message key="editor.issues.createIssue">Create Issue</message>
@@ -81,7 +81,7 @@
 	<message key="editor.issues.access">Access</message>
 	<message key="editor.issues.cover">Cover</message>
 	<message key="editor.issues.confirmIssueDelete">All articles will be returned to the editing queue and all associated files will be permanently removed.  Are you sure you want to remove this issue?</message>
-	<message key="editor.issues.resetIssueOrder"><![CDATA[This journal uses custom issue ordering. <a href="{$url}" class="action">Reset to defaults</a>]]></message>
+	<message key="editor.issues.resetIssueOrder"><![CDATA[This conference uses custom issue ordering. <a href="{$url}" class="action">Reset to defaults</a>]]></message>
 	<message key="editor.issues.resetSectionOrder"><![CDATA[This issue uses custom section ordering. <a href="{$url}" class="action">Reset to defaults</a>]]></message>
 	<message key="editor.issues.issueData">Issue Data</message>
 	<message key="editor.issues.saveChanges">Save changes to table of contents?</message>
@@ -146,6 +146,6 @@
 	<message key="editor.submission.selectGalleyFiles">Select Galley Files</message>
 	<message key="editor.submission.editorial.finalDraftDescription"><![CDATA[Final draft files in this list are transformed by a Copyeditor into copyedited versions, uploaded below under <span class="pkp_help_title">Copyediting</span>.]]></message>
 	<message key="editor.submission.proof.manageProofFilesDescription">Any files that have already been uploaded to any submission stage can be added to the Proofreading listing by checking the Include checkbox below and clicking Search: all available files will be listed and can be chosen for inclusion.</message>
-	<message key="editor.publicIdentificationExistsForTheSameType">The public identifier '{$publicIdentifier}' already exists for another object of the same type. Please choose unique identifiers for the objects of the same type within your journal.</message>
+	<message key="editor.publicIdentificationExistsForTheSameType">The public identifier '{$publicIdentifier}' already exists for another object of the same type. Please choose unique identifiers for the objects of the same type within your conference.</message>
 	<message key="editor.article.coverImage">Cover Image</message>
 </locale>

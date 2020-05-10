@@ -32,7 +32,7 @@
 	<message key="author.submit.confirmation">Confirmation</message>
 	<message key="author.submit.nextSteps">Next Steps</message>
 	<message key="submission.submit.cancelSubmission">You can complete this submission at a later date by selecting Active Submissions from the Author home.</message>
-	<message key="author.submit.notAccepting">This journal is not accepting submissions at this time.</message>
+	<message key="author.submit.notAccepting">This conference is not accepting submissions at this time.</message>
 	<message key="author.submit.requestWaiver">Request Waiver</message>
 	<message key="author.submit.qualifyForWaiver">Please consider waiving the Article Submission Fee for this article</message>
 	<message key="author.submit.addReasonsForWaiver">Please use the comments box below to indicate why fees should be waived.</message>
@@ -46,16 +46,16 @@
 	<message key="author.submissions.confirmDelete">Are you sure you want to delete this incomplete submission?</message>
 	<message key="author.submissions.viewStatus">View Status</message>
 	<message key="author.submissions.noSubmissions">No submissions.</message>
-	<message key="author.submit.journalSection">Journal Section</message>
-	<message key="author.submit.journalSectionDescription">Articles must be submitted to one of the journal's sections.</message>
+	<message key="author.submit.journalSection">Conference Section</message>
+	<message key="author.submit.journalSectionDescription">Articles must be submitted to one of the conference's sections.</message>
 	<message key="author.submit.verifyChecklist">You must make sure all items in the submission checklist are satisfied before continuing.</message>
-	<message key="author.submit.copyrightNoticeAgree">The authors agree to the terms of this Copyright Notice, which will apply to this submission if and when it is published by this journal (comments to the editor can be added below).</message>
+	<message key="author.submit.copyrightNoticeAgree">The authors agree to the terms of this Copyright Notice, which will apply to this submission if and when it is published by this conference (comments to the editor can be added below).</message>
 	<message key="author.submit.copyrightNoticeAgreeRequired">You must agree to the terms of the Copyright Notice before continuing.</message>
 	<message key="submission.submit.coverNote">Comments for the Editor</message>
 	<message key="author.submit.comments">Enter text (optional)</message>
-	<message key="author.submit.form.sectionRequired">Please select an appropriate journal section for this submission.</message>
+	<message key="author.submit.form.sectionRequired">Please select an appropriate conference section for this submission.</message>
 	<message key="author.submit.form.localeRequired">Please select a submission language.</message>
-	<message key="submission.submit.privacyStatement">Journal's Privacy Statement</message>
+	<message key="submission.submit.privacyStatement">Conference's Privacy Statement</message>
 	<message key="author.submit.reorderInstructions">Reorder authors to appear in the order they will be listed on publication.</message>
 	<message key="author.submit.reorder">Reorder author's name</message>
 	<message key="author.submit.selectPrincipalContact">Principal contact for editorial correspondence.</message>
@@ -106,7 +106,7 @@
 	<message key="author.submit.suppFile.form.descriptionRequired">Please enter a description.</message>
 	<message key="author.suppFile.suppFilePublicIdentificationExists">Public supplemental file identification already exists.</message>
 	<message key="author.suppFile.publicSuppFileIdentifier">Public supplemental file identifier</message>
-	<message key="author.submit.confirmationDescription">To submit your manuscript to {$journalTitle} click Finish Submission. The submission's principal contact will receive an acknowledgement by email and will be able to view the submission's progress through the editorial process by logging in to the journal web site. Thank you for your interest in publishing with {$journalTitle}.</message>
+	<message key="author.submit.confirmationDescription">To submit your manuscript to {$journalTitle} click Finish Submission. The submission's principal contact will receive an acknowledgement by email and will be able to view the submission's progress through the editorial process by logging in to the conference web site. Thank you for your interest in publishing with {$journalTitle}.</message>
 	<message key="author.submit.noFiles">No files have been attached to this submission.</message>
 	<message key="author.submit.filesSummary">File Summary</message>
 	<message key="author.submit.finishSubmission">Finish Submission</message>
@@ -114,5 +114,5 @@
 	<message key="author.article.uploadAuthorVersion">Upload Author Version</message>
 	<message key="author.article.copyeditedFile">Copyedited File</message>
 	<message key="author.article.authorRevisedFile">Author File</message>
-	<message key="author.submit.authorSubmitLoginMessage">A user account is required to submit to this journal. This allows our editors to track your submissions and contact you when the status of your submission changes, or if additional information is required from you.</message>
+	<message key="author.submit.authorSubmitLoginMessage">A user account is required to submit to this conference. This allows our editors to track your submissions and contact you when the status of your submission changes, or if additional information is required from you.</message>
 </locale>

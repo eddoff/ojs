@@ -36,7 +36,7 @@ Om det inte var du som skickade begäran, vänligen bortse från det här e-post
 	</email_text>
 	<email_text key="PASSWORD_RESET">
 		<subject>Lösenord återställt</subject>
-		<body><![CDATA[Ditt lösenord för {$siteTitle} har återställts. Spara nedanstående användarnamn och lösenord, de är nödvändiga för allt arbete med tidskriften.<br />
+		<body><![CDATA[Ditt lösenord för {$siteTitle} har återställts. Spara nedanstående användarnamn och lösenord, de är nödvändiga för allt arbete med konferensen.<br />
 <br />
 Ditt användarnamn: {$username}<br />
 Lösenord: {$password}<br />
@@ -45,10 +45,10 @@ Lösenord: {$password}<br />
 		<description>Det här e-postmeddelandet skickas till registrerade användare som bekräftelse på återställt lösenord (enligt beskrivning i PASSWORD_RESET_CONFIRM-mailet).</description>
 	</email_text>
 	<email_text key="USER_REGISTER">
-		<subject>Registrering hos tidskrift</subject>
+		<subject>Registrering hos konferens</subject>
 		<body><![CDATA[{$userFullName}<br />
 <br />
-Du har nu blivit registrerad som användare hos {$contextName}. Ditt användarnamn och lösenord bifogas i det här e-postmeddelandet. Inloggningsuppgifterna är nödvändiga för allt arbete med tidskriften genom dess webbplats. Du kan när som helst välja att få ditt användarkonto borttaget från tidskriften genom att kontakta mig.<br />
+Du har nu blivit registrerad som användare hos {$contextName}. Ditt användarnamn och lösenord bifogas i det här e-postmeddelandet. Inloggningsuppgifterna är nödvändiga för allt arbete med konferensen genom dess webbplats. Du kan när som helst välja att få ditt användarkonto borttaget från konferensen genom att kontakta mig.<br />
 <br />
 Användarnamn: {$username}<br />
 Lösenord: {$password}<br />
@@ -73,7 +73,7 @@ Vänligen,<br />
 		<subject>Registrering som granskare hos {$contextName}</subject>
 		<body><![CDATA[Baserat på den ämnesexpertis du besitter har vi tagit oss friheten att registrera ditt namn i granskardatabasen hos {$contextName}. Detta innebär inga förplikelser från din sida utan innebär endast att vi har möjlighet att höra av oss till dig med ett potentiellt granskningsuppdrag. I samband med inbjudan till granskning kommer du att kunna se titel och abstract för artikeln i fråga och du har alltid möjlighet att antingen acceptera eller avböja inbjudan. Du kan även när som helst be om att få ditt namn bortplockat från listan över granskare.<br />
 <br />
-Här förser vi dig med användarnamn och lösenord, som används i all interaktion med tidskriften via webbplatsen. Till exempel kan du logga in och uppdatera din profil och ange intresseområden för granskning.<br />
+Här förser vi dig med användarnamn och lösenord, som används i all interaktion med konferensen via webbplatsen. Till exempel kan du logga in och uppdatera din profil och ange intresseområden för granskning.<br />
 <br />
 Användarnamn: {$username}<br />
 Lösenord: {$password}<br />
@@ -90,53 +90,53 @@ Vänligen,<br />
 <br />
 Tack för visat intresse för vårt arbete,<br />
 {$editorialContactSignature}]]></body>
-		<description>Det här e-postmeddelandet skickas till registrerade läsare via "Meddela användare"-länken under redaktörens användarprofil. Det innehåller information om att det publicerats ett nytt nummer och välkomnar dem genom en länk att besöka tidskriften.</description>
+		<description>Det här e-postmeddelandet skickas till registrerade läsare via "Meddela användare"-länken under redaktörens användarprofil. Det innehåller information om att det publicerats ett nytt nummer och välkomnar dem genom en länk att besöka konferensen.</description>
 	</email_text>
 	<email_text key="LOCKSS_EXISTING_ARCHIVE">
 		<subject>Förfrågan om arkivering för {$contextName}</subject>
 		<body><![CDATA[Hej [universitetsbibliotekarie]!<br />
 <br />
-{$contextName} &amp;lt;{$contextUrl}&amp;gt; är en tidskrift där en medarbetare på ditt lärosäte, [namn på medarbetaren], bistår som [namn på position]. Tidskriften vill etablera ett LOCKSS-kompatibelt (Lots of Copies Keep Stuff Safe) arkiv vid det här och andra universitetsbibliotek.<br />
+{$contextName} &amp;lt;{$contextUrl}&amp;gt; är en konferens där en medarbetare på ditt lärosäte, [namn på medarbetaren], bistår som [namn på position]. Konferensen vill etablera ett LOCKSS-kompatibelt (Lots of Copies Keep Stuff Safe) arkiv vid det här och andra universitetsbibliotek.<br />
 <br />
-[Kortfattad beskrivning av tidskriften]<br />
+[Kortfattad beskrivning av konferensen]<br />
 <br />
-URL:en till LOCKSS Publisher Manifest för vår tidskrift är: {$contextUrl}/gateway/lockss<br />
+URL:en till LOCKSS Publisher Manifest för vår konferens är: {$contextUrl}/gateway/lockss<br />
 <br />
-Vi har förstått att ni redan deltar i LOCKSS. Vi bistår gärna med ytterligare metadata som eventuellt behövs för att registrera vår tidskrift i er LOCKSS-version.<br />
+Vi har förstått att ni redan deltar i LOCKSS. Vi bistår gärna med ytterligare metadata som eventuellt behövs för att registrera vår konferens i er LOCKSS-version.<br />
 <br />
 Tack och med vänliga hälsningar,<br />
 {$principalContactSignature}]]></body>
-		<description>Det här e-postmeddelandet är en förfrågan till den som administrerar ett LOCKSS-arkiv att överväga inkludering av den här tidskriften i deras arkiv. Meddelandet innehåller URL:en till tidskriftens LOCKSS Publisher Manifest.</description>
+		<description>Det här e-postmeddelandet är en förfrågan till den som administrerar ett LOCKSS-arkiv att överväga inkludering av den här konferensen i deras arkiv. Meddelandet innehåller URL:en till konferensens LOCKSS Publisher Manifest.</description>
 	</email_text>
 	<email_text key="LOCKSS_NEW_ARCHIVE">
 		<subject>Förfrågan om arkivering för {$contextName}</subject>
 		<body><![CDATA[Hej [universitetsbibliotekarie]!<br />
 <br />
-{$contextName} &amp;lt;{$contextUrl}&amp;gt; är en tidskrift där en medarbetare på ditt lärosäte, [namn på medarbetaren], bistår som [namn på position]. Tidskriften vill etablera ett LOCKSS-kompatibelt (Lots of Copies Keep Stuff Safe) arkiv vid det här och andra universitetsbibliotek.<br />
+{$contextName} &amp;lt;{$contextUrl}&amp;gt; är en konferens där en medarbetare på ditt lärosäte, [namn på medarbetaren], bistår som [namn på position]. Konferensen vill etablera ett LOCKSS-kompatibelt (Lots of Copies Keep Stuff Safe) arkiv vid det här och andra universitetsbibliotek.<br />
 <br />
-[Kortfattad beskrivning av tidskriften]<br />
+[Kortfattad beskrivning av konferensen]<br />
 <br />
 LOCKSS-samarbetet &amp;lt;http://lockss.org/&amp;gt;, ett internationellt biblioteks- och utgivarinitiativ, är ett exempel på ett distribuerat arkiv för bevarande (se nedan för ytterligare information). Mjukvaran är gratis och kan köras på en vanlig dator. Systemet hämtas från nätet och kräver väldigt litet kontinuerligt underhåll.<br />
 <br />
-Det skulle vara till stor hjälp för oss i sökandet efter bevarandelösningar för vår tidskrift om ni ville överväga att bli medlemmar i LOCKSS-gemenskapen och på det sättet hjälpa till att samla och bevara titlar producerade vid lärosätet och av andra forskare runt om i världen. Om ni vill gå vidare med detta, vänligen se LOCKSS webbplats för mer information om hur systemet fungerar. Jag ser fram emot att höra från er angående möjligheterna för er att stödja arkiveringen av vår tidskrift genom detta.<br />
+Det skulle vara till stor hjälp för oss i sökandet efter bevarandelösningar för vår konferens om ni ville överväga att bli medlemmar i LOCKSS-gemenskapen och på det sättet hjälpa till att samla och bevara titlar producerade vid lärosätet och av andra forskare runt om i världen. Om ni vill gå vidare med detta, vänligen se LOCKSS webbplats för mer information om hur systemet fungerar. Jag ser fram emot att höra från er angående möjligheterna för er att stödja arkiveringen av vår konferens genom detta.<br />
 <br />
 Tack och med vänliga hälsningar,<br />
 {$principalContactSignature}]]></body>
-		<description>Det här e-postmeddelandet rekommenderar mottagaren att delta i LOCKSS-initiativet och att inkludera tidskriften i arkivet. Meddelandet innehåller även generell information om LOCKSS och hur man gör för att delta.</description>
+		<description>Det här e-postmeddelandet rekommenderar mottagaren att delta i LOCKSS-initiativet och att inkludera konferensen i arkivet. Meddelandet innehåller även generell information om LOCKSS och hur man gör för att delta.</description>
 	</email_text>
 	<email_text key="SUBMISSION_ACK">
 		<subject>Bekräftelse på mottaget bidrag</subject>
 		<body><![CDATA[{$authorName}:<br />
 <br />
-Tack för att du har skickat in manuskriptet &quot;{$submissionTitle}&quot; till {$contextName}. I det publiceringssystem vi använder har du möjlighet att följa dess väg i den redaktionella processen genom att logga in på tidskriftens webbplats:<br />
+Tack för att du har skickat in manuskriptet &quot;{$submissionTitle}&quot; till {$contextName}. I det publiceringssystem vi använder har du möjlighet att följa dess väg i den redaktionella processen genom att logga in på konferensens webbplats:<br />
 <br />
 Bidragets URL: {$submissionUrl}<br />
 Användarnamn: {$authorUsername}<br />
 <br />
-Om du har några frågor, vänligen kontakta mig. Tack för att du har valt att skicka ditt bidrag till den här tidskriften.<br />
+Om du har några frågor, vänligen kontakta mig. Tack för att du har valt att skicka ditt bidrag till den här konferensen.<br />
 <br />
 {$editorialContactSignature}]]></body>
-		<description>Det här e-postmeddelandet skickas, om det är aktiverat, automatiskt till författare när de skickar in sina manuskript till tidskriften. Meddelandet innehåller information om hur författaren kan följa bidraget genom redaktionella processen samt ett tack för för inskickat bidrag.</description>
+		<description>Det här e-postmeddelandet skickas, om det är aktiverat, automatiskt till författare när de skickar in sina manuskript till konferensen. Meddelandet innehåller information om hur författaren kan följa bidraget genom redaktionella processen samt ett tack för för inskickat bidrag.</description>
 	</email_text>
 	<email_text key="SUBMISSION_ACK_NOT_USER">
 	  <subject>Bekräftelse på mottaget bidrag</subject>
@@ -144,7 +144,7 @@ Om du har några frågor, vänligen kontakta mig. Tack för att du har valt att 
 <br />
 {$submitterName} har skickat in manuskriptet &quot;{$submissionTitle}&quot; till {$contextName}.<br />
 <br />
-Om du har några frågor, vänligen kontakta mig. Tack för att du har valt att skicka ditt bidrag till den här tidskriften.<br />
+Om du har några frågor, vänligen kontakta mig. Tack för att du har valt att skicka ditt bidrag till den här konferensen.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>Det här e-postmeddelandet skickas, om det är aktiverat, automatiskt till andra författare knutna till bidraget i inskickningsprocessen men som inte är OJS-användare.</description>
@@ -160,7 +160,7 @@ Användarnamn: {$editorUsername}<br />
 <br />
 Tack och med vänliga hälsningar,<br />
 {$editorialContactSignature}]]></body>
-		<description>Det här e-postmeddelandet meddelar en sektionsredaktör att redaktören utsett hen att ansvara för ett bidrag genom den redaktionella processen. Det innehåller även information om bidraget och hur man loggar in på tidskriftens webbplats.</description>
+		<description>Det här e-postmeddelandet meddelar en sektionsredaktör att redaktören utsett hen att ansvara för ett bidrag genom den redaktionella processen. Det innehåller även information om bidraget och hur man loggar in på konferensens webbplats.</description>
 	</email_text>
 	<email_text key="REVIEW_REQUEST">
 		<subject>Förfrågan om granskning av artikel</subject>
@@ -168,11 +168,11 @@ Tack och med vänliga hälsningar,<br />
 <br />
 Jag tror att du skulle passa utmärkt som sakkunniggranskare av manuskriptet &quot;{$submissionTitle}&quot;, som har skickats in till {$contextName}. Bidragets abstract bifogas nedan. Jag hoppas att du kan överväga att genomföra granskningen åt oss, då det vore mycket värdefullt.<br />
 <br />
-Vänligen logga in på tidskriftens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation. Adressen till webbplatsen är {$contextUrl}.<br />
+Vänligen logga in på konferensens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation. Adressen till webbplatsen är {$contextUrl}.<br />
 <br />
 Deadline för själva granskningen är {$reviewDueDate}.<br />
 <br />
-Om du har glömt ditt användarnamn och/eller lösenord till tidskriftens webbplats, använd följande länk för att återställa lösenordet: {$passwordResetUrl}. Dina inloggningsuppgifter skickas då till dig per e-post.<br />
+Om du har glömt ditt användarnamn och/eller lösenord till konferensens webbplats, använd följande länk för att återställa lösenordet: {$passwordResetUrl}. Dina inloggningsuppgifter skickas då till dig per e-post.<br />
 <br />
 Bidragets URL: {$submissionReviewUrl}<br />
 <br />
@@ -192,11 +192,11 @@ Det här är bara en påminnelse om vår förfrågan om huruvida du skulle vara 
 <br />
 Jag tror att du skulle passa utmärkt som sakkunniggranskare av manuskriptet. Bidragets abstract bifogas nedan. Jag hoppas att du kan överväga att genomföra granskningen åt oss, då det vore mycket värdefullt.<br />
 <br />
-Vänligen logga in på tidskriftens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation. Adressen till webbplatsen är {$contextUrl}.<br />
+Vänligen logga in på konferensens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation. Adressen till webbplatsen är {$contextUrl}.<br />
 <br />
 Deadline för själva granskningen är {$reviewDueDate}.<br />
 <br />
-Om du har glömt ditt användarnamn och/eller lösenord till tidskriftens webbplats, använd följande länk för att återställa lösenordet: {$passwordResetUrl}. Dina inloggningsuppgifter skickas då till dig per e-post.<br />
+Om du har glömt ditt användarnamn och/eller lösenord till konferensens webbplats, använd följande länk för att återställa lösenordet: {$passwordResetUrl}. Dina inloggningsuppgifter skickas då till dig per e-post.<br />
 <br />
 Bidragets URL: {$submissionReviewUrl}<br />
 <br />
@@ -215,7 +215,7 @@ Tack för att du överväger granskningsuppdraget.<br />
 <br />
 Jag tror att du skulle passa utmärkt som sakkunniggranskare av manuskriptet &quot;{$submissionTitle}&quot;, som har skickats in till {$contextName}. Bidragets abstract bifogas nedan. Jag hoppas att du kan överväga att genomföra granskningen åt oss, då det vore mycket värdefullt.<br />
 <br />
-Vänligen logga in på tidskriftens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation.<br />
+Vänligen logga in på konferensens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation.<br />
 <br />
 Deadline för själva granskningen är {$reviewDueDate}.<br />
 <br />
@@ -237,7 +237,7 @@ Det här är bara en påminnelse om vår förfrågan om huruvida du skulle vara 
 <br />
 Jag tror att du skulle passa utmärkt som sakkunniggranskare av manuskriptet. Bidragets abstract bifogas nedan. Jag hoppas att du kan överväga att genomföra granskningen åt oss, då det vore mycket värdefullt.<br />
 <br />
-Vänligen logga in på tidskriftens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation.<br />
+Vänligen logga in på konferensens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation.<br />
 <br />
 Deadline för själva granskningen är {$reviewDueDate}.<br />
 <br />
@@ -256,7 +256,7 @@ Tack för att du överväger granskningsuppdraget.<br />
 		<subject>Förfrågan om granskning av artikel</subject>
 		<body><![CDATA[{$reviewerName}:<br />
 <br />
-Jag tror att du skulle passa utmärkt som sakkunniggranskare av manuskriptet &quot;{$submissionTitle}&quot; och detta är en förfrågan om du skulle vara villig att ta dig an den här viktiga uppgiften åt oss. Tidskriftens Riktlinjer för granskare bifogas här nedan, och bidraget finns som bilaga i det här e-postmeddelandet. Din bedömning av bidraget ska tillsammans med din rekommendation skickas per e-post till mig senast {$reviewDueDate}.<br />
+Jag tror att du skulle passa utmärkt som sakkunniggranskare av manuskriptet &quot;{$submissionTitle}&quot; och detta är en förfrågan om du skulle vara villig att ta dig an den här viktiga uppgiften åt oss. Konferensens Riktlinjer för granskare bifogas här nedan, och bidraget finns som bilaga i det här e-postmeddelandet. Din bedömning av bidraget ska tillsammans med din rekommendation skickas per e-post till mig senast {$reviewDueDate}.<br />
 <br />
 Vänligen meddela mig genom att svara på det här meddelandet senast {$responseDueDate} om du har möjlighet att åta dig uppdraget eller inte.<br />
 <br />
@@ -279,11 +279,11 @@ Detta gäller manuskriptet &quot;{$submissionTitle},&quot;, som är under överv
 <br />
 Efter granskningen av en tidigare version av manuskriptet har författarna nu skickat in en reviderad version av sin artikel. Vi är glada om du skulle kunna hjälpa oss att utvärdera denna.<br />
 <br />
-Vänligen logga in på tidskriftens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation. Webbplatsens adress är: {$contextUrl}.<br />
+Vänligen logga in på konferensens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation. Webbplatsens adress är: {$contextUrl}.<br />
 <br />
 Deadline för själva granskningen är {$reviewDueDate}.<br />
 <br />
-Om du har glömt ditt användarnamn och/eller lösenord till tidskriftens webbplats, använd följande länk för att återställa lösenordet: {$passwordResetUrl}. Dina inloggningsuppgifter skickas då till dig per e-post.<br />
+Om du har glömt ditt användarnamn och/eller lösenord till konferensens webbplats, använd följande länk för att återställa lösenordet: {$passwordResetUrl}. Dina inloggningsuppgifter skickas då till dig per e-post.<br />
 <br />
 Bidragets URL: {$submissionReviewUrl}<br />
 <br />
@@ -304,7 +304,7 @@ Detta gäller manuskriptet &quot;{$submissionTitle},&quot;, som är under överv
 <br />
 Efter granskningen av en tidigare version av manuskriptet har författarna nu skickat in en reviderad version av sin artikel. Vi är glada om du skulle kunna hjälpa oss att utvärdera denna.<br />
 <br />
-Vänligen logga in på tidskriftens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation. Webbplatsens adress är: {$contextUrl}.<br />
+Vänligen logga in på konferensens webbplats senast {$responseDueDate} och svara om du har möjlighet att åta dig granskningsuppdraget eller inte. Det är också där du får tillgång till bidraget och lägger in din granskning och rekommendation. Webbplatsens adress är: {$contextUrl}.<br />
 <br />
 Deadline för själva granskningen är {$reviewDueDate}.<br />
 <br />
@@ -346,7 +346,7 @@ Riktlinjer för granskare<br />
 		<subject>Förfrågan om granskning återkallad</subject>
 		<body><![CDATA[{$reviewerName}:<br />
 <br />
-Vi har beslutat att återkalla vår förfrågan till dig om att granska bidraget &quot;{$submissionTitle},&quot; för {$contextName}. Vi ber om ursäkt för besväret och hoppas att vi även i framtiden kan fråga dig om granskningsuppdrag för tidskriftens räkning.<br />
+Vi har beslutat att återkalla vår förfrågan till dig om att granska bidraget &quot;{$submissionTitle},&quot; för {$contextName}. Vi ber om ursäkt för besväret och hoppas att vi även i framtiden kan fråga dig om granskningsuppdrag för konferensens räkning.<br />
 <br />
 Om du har några frågor, vänligen kontakta mig.
 <br />
@@ -375,7 +375,7 @@ Tyvärr har jag inte möjlighet i nuläget att granska bidraget &quot;{$submissi
 		<subject>Bekräftelse på granskning av artikel</subject>
 		<body><![CDATA[{$reviewerName}:<br />
 <br />
-Tack för att du genomfört granskningen av bidraget &quot;{$submissionTitle}&quot; för {$contextName}. Vi uppskattar ditt arbete din roll i att bibehålla tidskriftens kvalitet.<br />
+Tack för att du genomfört granskningen av bidraget &quot;{$submissionTitle}&quot; för {$contextName}. Vi uppskattar ditt arbete din roll i att bibehålla konferensens kvalitet.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>Det här e-postmeddelandet skickas från en sektionsredaktör för att bekräfta att en färdig granskning inkommit och för att tacka granskaren för utfört arbete.</description>
@@ -386,11 +386,11 @@ Tack för att du genomfört granskningen av bidraget &quot;{$submissionTitle}&qu
 <br />
 Det här är bara en påminnelse om vår förfrågan om din granskning av bidraget &quot;{$submissionTitle}&quot; för {$contextName}. Vi hade hoppats på att få din granskning senast {$reviewDueDate} och skulle vara tacksamma om du ville inkomma med den så fort som möjligt.<br />
 <br />
-Om du har glömt ditt användarnamn och/eller lösenord till tidskriftens webbplats, använd följande länk för att återställa lösenordet: {$passwordResetUrl}. Dina inloggningsuppgifter skickas då till dig per e-post.<br />
+Om du har glömt ditt användarnamn och/eller lösenord till konferensens webbplats, använd följande länk för att återställa lösenordet: {$passwordResetUrl}. Dina inloggningsuppgifter skickas då till dig per e-post.<br />
 <br />
 Bidragets URL: {$submissionReviewUrl}<br />
 <br />
-Vänligen bekräfta snarast om du har möjlighet att genomföra granskningsuppdraget, som utgör en viktig del av tidskriftens arbete. Vi ser fram emot att höra från dig.<br />
+Vänligen bekräfta snarast om du har möjlighet att genomföra granskningsuppdraget, som utgör en viktig del av konferensens arbete. Vi ser fram emot att höra från dig.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>Det här e-postmeddelandet skickas från en sektionsredaktör som en påminnelse till granskaren att deadline för granskningen har passerat.</description>
@@ -403,7 +403,7 @@ Det här är bara en påminnelse om vår förfrågan om din granskning av bidrag
 <br />
 Bidragets URL: {$submissionReviewUrl}<br />
 <br />
-Vänligen bekräfta snarast om du har möjlighet att genomföra granskningsuppdraget, som utgör en viktig del av tidskriftens arbete. Vi ser fram emot att höra från dig.<br />
+Vänligen bekräfta snarast om du har möjlighet att genomföra granskningsuppdraget, som utgör en viktig del av konferensens arbete. Vi ser fram emot att höra från dig.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>Det här e-postmeddelandet skickas från en sektionsredaktör som en påminnelse till granskaren att deadline för granskningen har passerat.</description>
@@ -414,11 +414,11 @@ Vänligen bekräfta snarast om du har möjlighet att genomföra granskningsuppdr
 <br />
 Det här är bara en påminnelse om vår förfrågan om din granskning av bidraget &quot;{$submissionTitle}&quot; för {$contextName}. Vi hade hoppats på att få din granskning senast {$reviewDueDate} och det här e-postmeddelandet skickas automatiskt när datum för deadline passeras. Vi skulle fortfarande vara tacksamma över att få in din granskning, så fort som möjligt.<br />
 <br />
-Om du har glömt ditt användarnamn och/eller lösenord till tidskriftens webbplats, använd följande länk för att återställa lösenordet: {$passwordResetUrl}. Dina inloggningsuppgifter skickas då till dig per e-post.<br />
+Om du har glömt ditt användarnamn och/eller lösenord till konferensens webbplats, använd följande länk för att återställa lösenordet: {$passwordResetUrl}. Dina inloggningsuppgifter skickas då till dig per e-post.<br />
 <br />
 Bidragets URL: {$submissionReviewUrl}<br />
 <br />
-Vänligen bekräfta snarast om du har möjlighet att genomföra granskningsuppdraget, som utgör en viktig del av tidskriftens arbete. Vi ser fram emot att höra från dig.<br />
+Vänligen bekräfta snarast om du har möjlighet att genomföra granskningsuppdraget, som utgör en viktig del av konferensens arbete. Vi ser fram emot att höra från dig.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>Det här e-postmeddelandet skickas automatiskt när en granskares deadline löper ut (se Granskningsalternativ under Inställningar &gt; Arbetsflöde &gt; Granskning) och när Granskartillgång med ett klick är avaktiverat. Schemalagda aktiviteter måste vara aktiverat och konfigurerat (se serverns konfigurationsfil).</description>
@@ -431,7 +431,7 @@ Det här är bara en påminnelse om vår förfrågan om din granskning av bidrag
 <br />
 Bidragets URL: {$submissionReviewUrl}<br />
 <br />
-Vänligen bekräfta snarast om du har möjlighet att genomföra granskningsuppdraget, som utgör en viktig del av tidskriftens arbete. Vi ser fram emot att höra från dig.<br />
+Vänligen bekräfta snarast om du har möjlighet att genomföra granskningsuppdraget, som utgör en viktig del av konferensens arbete. Vi ser fram emot att höra från dig.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>Det här e-postmeddelandet skickas automatiskt när en granskares deadline löper ut (se Granskningsalternativ under Inställningar &gt; Arbetsflöde &gt; Granskning) och när Granskning utan inloggning är aktiverat. Schemalagda aktiviteter måste vara aktiverat och konfigurerat (se serverns konfigurationsfil).</description>
@@ -543,7 +543,7 @@ Användarnamn: {$participantUsername}<br />
 <br />
 Bidraget &quot;{$submissionTitle}&quot; till {$contextName} behöver nu få publiceringsversioner skapade genom att följa nedanstående steg:<br />
 1. Klicka på Bidragets URL nedan.<br />
-2. Logga in på tidskriften och använd filerna under Filer redo för produktion för att skapa publiceringsversioner enligt tidskriftens standarder.<br />
+2. Logga in på konferensen och använd filerna under Filer redo för produktion för att skapa publiceringsversioner enligt konferensens standarder.<br />
 3. Ladda upp publiceringsversionerna till sektionen Filer för publiceringsversion.<br />
 4. Meddela Redaktören, genom att använda Produktionsdiskussioner, att publiceringsversionerna är uppladdade och klara.<br />
 <br />
@@ -551,7 +551,7 @@ Bidraget &quot;{$submissionTitle}&quot; till {$contextName} behöver nu få publ
 Bidragets URL: {$submissionLayoutUrl}<br />
 Användarnamn: {$participantUsername}<br />
 <br />
-Om du för tillfället inte har möjlighet att genomföra det här arbetet, eller om du har frågor, vänligen kontakta mig. Tack för ditt arbete med tidskriften.<br />
+Om du för tillfället inte har möjlighet att genomföra det här arbetet, eller om du har frågor, vänligen kontakta mig. Tack för ditt arbete med konferensen.<br />
 <br />
 {$editorialContactSignature}]]></body>
 		<description>Det här e-postmeddelandet från sektionsredaktören till layoutredaktören för att meddela att hen har blivit tilldelad uppgiften att vara layoutredaktör för ett bidrag. Det innehåller information om bidraget och hur man får tillgång till det.</description>
@@ -570,13 +570,13 @@ Vänligen kontakta mig om du har några frågor.<br />
 	<email_text key="EMAIL_LINK">
 	  <subject>Artikel som kan vara av intresse för dig</subject>
 	  <body><![CDATA[Tänkte att du skulle kunna vara intresserad av artikeln &quot;{$submissionTitle}&quot; av {$authorName}, publicerad i vol. {$volume}, nr. {$number} ({$year}) av {$contextName} på &quot;{$articleUrl}&quot;.]]></body>
-	  <description>Den här e-postmallen ger en registrerad läsare möjligheten att skicka information om en artikel till någon annan som hen tror kan vara intresserad. Den är tillgänglig via Läsverktyg och måste vara aktiverat av tidskriftsansvarig på administrationssidan för Läsverktyg.</description>
+	  <description>Den här e-postmallen ger en registrerad läsare möjligheten att skicka information om en artikel till någon annan som hen tror kan vara intresserad. Den är tillgänglig via Läsverktyg och måste vara aktiverat av konferenssansvarig på administrationssidan för Läsverktyg.</description>
 	</email_text>
 	<email_text key="SUBSCRIPTION_NOTIFY">
 		<subject>Meddelande om prenumerationsregistrering</subject>
 		<body><![CDATA[{$subscriberName}:<br />
 <br />
-Du har nu registrerats som prenumerant i vårt webbaserade tidskriftssystem för {$contextName}, med följande prenumeration:<br />
+Du har nu registrerats som prenumerant i vårt webbaserade konferenssystem för {$contextName}, med följande prenumeration:<br />
 <br />
 {$subscriptionType}<br />
 <br />
@@ -589,7 +589,7 @@ OBS! Om du har en institutionsprenumeration behöver inte användare tillhörand
 Vänligen kontakta mig om du har några frågor.<br />
 <br />
 {$subscriptionContactSignature}]]></body>
-		<description>Det här e-postmeddelandet meddelar en registrerad läsare att ansvariga har skapat en prenumeration åt hen. Det inkluderar tidskriftens URL samt instruktioner för tillgång.</description>
+		<description>Det här e-postmeddelandet meddelar en registrerad läsare att ansvariga har skapat en prenumeration åt hen. Det inkluderar konferensens URL samt instruktioner för tillgång.</description>
 	</email_text>
 	<email_text key="OPEN_ACCESS_NOTIFY">
 		<subject>Nummer nu tillgängligt som open access</subject>
@@ -610,45 +610,45 @@ Din prenumeration på {$contextName} håller på att förfalla.<br />
 {$subscriptionType}<br />
 Förfallodatum: {$expiryDate}<br />
 <br />
-För att försäkra dig om fortsatt tillgång till den här tidskriften, gå till tidskriftens webbplats och förnya din prenumeration. Du loggar in i systemet med ditt användarnamn, &quot;{$username}&quot;.<br />
+För att försäkra dig om fortsatt tillgång till den här konferensen, gå till konferensens webbplats och förnya din prenumeration. Du loggar in i systemet med ditt användarnamn, &quot;{$username}&quot;.<br />
 <br />
 Vänligen kontakta mig om du har frågor.<br />
 <br />
 {$subscriptionContactSignature}]]></body>
-		<description>Det här e-postmeddelandet meddelar en prenumerant att prenumerationen håller på att förfalla. Det inkluderar tidskriftens URL samt instruktioner för tillgång.</description>
+		<description>Det här e-postmeddelandet meddelar en prenumerant att prenumerationen håller på att förfalla. Det inkluderar konferensens URL samt instruktioner för tillgång.</description>
 	</email_text>
 	<email_text key="SUBSCRIPTION_AFTER_EXPIRY">
 		<subject>Prenumeration har förfallit</subject>
 		<body><![CDATA[{$subscriberName}:<br />
 <br />
-Din prenumeration på tidskriften {$contextName} har förfallit.<br />
+Din prenumeration på konferensen {$contextName} har förfallit.<br />
 <br />
 {$subscriptionType}<br />
 Förfallodatum: {$expiryDate}<br />
 <br />
-Gå till tidskriftens webbplats för att förnya din prenumeration. Du loggar in i systemet med ditt användarnamn, &quot;{$username}&quot;.<br />
+Gå till konferensens webbplats för att förnya din prenumeration. Du loggar in i systemet med ditt användarnamn, &quot;{$username}&quot;.<br />
 <br />
 Vänligen kontakta mig om du har frågor.<br />
 <br />
 {$subscriptionContactSignature}]]></body>
-		<description>Det här e-postmeddelandet meddelar en prenumerant att prenumerationen har förfallit. Det inkluderar tidskriftens URL samt instruktioner för tillgång.</description>
+		<description>Det här e-postmeddelandet meddelar en prenumerant att prenumerationen har förfallit. Det inkluderar konferensens URL samt instruktioner för tillgång.</description>
 	</email_text>
 	<email_text key="SUBSCRIPTION_AFTER_EXPIRY_LAST">
 		<subject>Prenumeration har förfallit – sista påminnelsen</subject>
 		<body><![CDATA[{$subscriberName}:<br />
 <br />
-Din prenumeration på tidskriften {$contextName} har förfallit.<br />
+Din prenumeration på konferensen {$contextName} har förfallit.<br />
 Observera att det här är den sista påminnelsen som skickas till dig.<br />
 <br />
 {$subscriptionType}<br />
 Förfallodatum: {$expiryDate}<br />
 <br />
-Gå till tidskriftens webbplats för att förnya din prenumeration. Du loggar in i systemet med ditt användarnamn, &quot;{$username}&quot;.<br />
+Gå till konferensens webbplats för att förnya din prenumeration. Du loggar in i systemet med ditt användarnamn, &quot;{$username}&quot;.<br />
 <br />
 Vänligen kontakta mig om du har frågor.<br />
 <br />
 {$subscriptionContactSignature}]]></body>
-		<description>Det här e-postmeddelandet meddelar en prenumerant att prenumerationen har gått ut. Det inkluderar tidskriftens URL samt instruktioner för tillgång.</description>
+		<description>Det här e-postmeddelandet meddelar en prenumerant att prenumerationen har gått ut. Det inkluderar konferensens URL samt instruktioner för tillgång.</description>
 	</email_text>
 	<email_text key="SUBSCRIPTION_PURCHASE_INDL">
 		<subject>Tecknande av prenumeration: Enskild prenumeration</subject>
