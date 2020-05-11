@@ -1,9 +1,9 @@
 {**
  * templates/payments/userInstitutionalSubscriptionForm.tpl
  *
- * Copyright (c) 2014-2018 Simon Fraser University
- * Copyright (c) 2003-2018 John Willinsky
- * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2020 Simon Fraser University
+ * Copyright (c) 2003-2020 John Willinsky
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * User purchase institutional subscription form
  *
@@ -17,7 +17,7 @@
 
 	{assign var="formPath" value="institutional"}
 	{if $subscriptionId}
-		{assign var="formPath" value="institutional":to_array:$subscriptionId}
+		{assign var="formPath" value="institutional"|to_array:$subscriptionId}
 	{/if}
 	<form class="cmp_form purchase_subscription" method="post" id="subscriptionForm" action="{url op="payPurchaseSubscription" path=$formPath}">
 		{csrf}
@@ -104,3 +104,5 @@
 
 	</form>
 </div>
+
+{include file="frontend/components/footer.tpl"}

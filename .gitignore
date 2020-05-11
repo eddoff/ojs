@@ -10,5 +10,8 @@ temp
 .DS_Store
 node_modules
 js/build.js
+js/hot-updates
 styles/build.css
-.vs
+cypress.env.json
+cypress/logs/
+cypress/screenshots/

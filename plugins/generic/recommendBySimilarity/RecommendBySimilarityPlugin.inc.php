@@ -3,9 +3,9 @@
 /**
  * @file plugins/generic/recommendBySimilarity/RecommendBySimilarityPlugin.inc.php
  *
- * Copyright (c) 2014-2018 Simon Fraser University
- * Copyright (c) 2003-2018 John Willinsky
- * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2020 Simon Fraser University
+ * Copyright (c) 2003-2020 John Willinsky
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class RecommendBySimilarityPlugin
  * @ingroup plugins_generic_recommendBySimilarity
@@ -50,13 +50,6 @@ class RecommendBySimilarityPlugin extends GenericPlugin {
 		return __('plugins.generic.recommendBySimilarity.description');
 	}
 
-	/**
-	 * @copydoc PKPPlugin::getTemplatePath
-	 */
-	function getTemplatePath($inCore = false) {
-		return parent::getTemplatePath($inCore) . 'templates/';
-	}
-
 
 	//
 	// View level hook implementations.
@@ -69,7 +62,7 @@ class RecommendBySimilarityPlugin extends GenericPlugin {
 		$output =& $params[2];
 
 		// Identify similarity terms for the given article.
-		$displayedArticle = $smarty->get_template_vars('article');
+		$displayedArticle = $smarty->getTemplateVars('article');
 		$articleId = $displayedArticle->getId();
 		import('classes.search.ArticleSearch');
 		$articleSearch = new ArticleSearch();
@@ -78,7 +71,7 @@ class RecommendBySimilarityPlugin extends GenericPlugin {
 
 		// If we got similarity terms then execute a search with...
 		// ... request, journal and error messages, ...
-		$request = PKPApplication::getRequest();
+		$request = Application::get()->getRequest();
 		$router = $request->getRouter();
 		$journal = $router->getContext($request);
 		$error = null;
@@ -88,13 +81,20 @@ class RecommendBySimilarityPlugin extends GenericPlugin {
 		// ... and pagination.
 		$rangeInfo = Handler::getRangeInfo($request, 'articlesBySimilarity');
 		$rangeInfo->setCount(RECOMMEND_BY_SIMILARITY_PLUGIN_COUNT);
-
-		$results = $articleSearch->retrieveResults($request, $journal, $keywords, $error, null, null, $rangeInfo, array($articleId));
-		$smarty->assign('articlesBySimilarity', $results);
-		$smarty->assign('articlesBySimilarityQuery', $query);
-
-		$output .= $smarty->fetch($this->getTemplatePath() . 'articleFooter.tpl');
+		$smarty->assign(array(
+			'articlesBySimilarity' => $articleSearch->retrieveResults(
+					$request,
+					$journal,
+					$keywords,
+					$error,
+					null, null,
+					$rangeInfo,
+					array($articleId)
+			),
+			'articlesBySimilarityQuery' => $query,
+		));
+		$output .= $smarty->fetch($this->getTemplateResource('articleFooter.tpl'));
 		return false;
 	}
 }
-?>
+

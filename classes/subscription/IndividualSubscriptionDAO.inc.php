@@ -3,9 +3,9 @@
 /**
  * @file classes/subscription/IndividualSubscriptionDAO.inc.php
  *
- * Copyright (c) 2014-2018 Simon Fraser University
- * Copyright (c) 2003-2018 John Willinsky
- * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2020 Simon Fraser University
+ * Copyright (c) 2003-2020 John Willinsky
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class IndividualSubscriptionDAO
  * @ingroup subscription
@@ -398,46 +398,25 @@ class IndividualSubscriptionDAO extends SubscriptionDAO {
 	 * @return object DAOResultFactory containing IndividualSubscriptions
 	 */
 	function getAll($rangeInfo = null) {
+		$userDao = DAORegistry::getDAO('UserDAO'); /* @var $userDao UserDAO */
 		$result = $this->retrieveRange(
-			'SELECT s.*
+			'SELECT s.*,
+			' . $userDao->getFetchColumns() .'
 			FROM
 			subscriptions s,
 			subscription_types st,
-			users u
+			users u,
+			' . $userDao->getFetchJoins() .'
 			WHERE s.type_id = st.type_id
 			AND st.institutional = 0
 			AND s.user_id = u.user_id
-			ORDER BY
-			u.last_name ASC,
+			' . $userDao->getOrderBy() .',
 			s.subscription_id',
-			false,
+			$userDao->getFetchParameters(),
 			$rangeInfo
 		);
 
 		return new DAOResultFactory($result, $this, '_fromRow');
-	}
-
-	/**
-	 * Retrieve all individual subscribed users.
-	 * @return object DAOResultFactory containing IndividualSubscriptions
-	 */
-	function getSubscribedUsers($journalId, $rangeInfo = null) {
-		$result = $this->retrieveRange(
-			'SELECT	u.*
-			FROM	subscriptions s,
-				subscription_types st,
-				users u
-			WHERE	s.type_id = st.type_id AND
-				st.institutional = 0 AND
-				s.user_id = u.user_id AND
-				s.journal_id = ?
-			ORDER BY u.last_name ASC, s.subscription_id',
-			array((int) $journalId),
-			$rangeInfo
-		);
-
-		$userDao = DAORegistry::getDAO('UserDAO');
-		return new DAOResultFactory($result, $userDao, '_returnUserFromRow');
 	}
 
 	/**
@@ -453,16 +432,20 @@ class IndividualSubscriptionDAO extends SubscriptionDAO {
 	 * @return object DAOResultFactory containing matching IndividualSubscriptions
 	 */
 	function getByJournalId($journalId, $status = null, $searchField = null, $searchMatch = null, $search = null, $dateField = null, $dateFrom = null, $dateTo = null, $rangeInfo = null) {
+		$userDao = DAORegistry::getDAO('UserDAO'); /* @var $userDao UserDAO */
+		$params = array_merge($userDao->getFetchParameters(), array((int) $journalId));
 		$result = $this->retrieveRange(
-			'SELECT	s.*
+			'SELECT	s.*,
+			' . $userDao->getFetchColumns() . '
 			FROM	subscriptions s
 				JOIN subscription_types st ON (s.type_id = st.type_id)
 				JOIN users u ON (s.user_id = u.user_id)
+				' . $userDao->getFetchJoins() . '
 			WHERE	st.institutional = 0
 				AND s.journal_id = ? ' .
-			parent::_generateSearchSQL($status, $searchField, $searchMatch, $search, $dateField, $dateFrom, $dateTo, $params) .
-			' ORDER BY u.last_name ASC, s.subscription_id',
-			array((int) $journalId),
+			parent::_generateSearchSQL($status, $searchField, $searchMatch, $search, $dateField, $dateFrom, $dateTo, $params) . ' ' .
+			$userDao->getOrderBy() .', s.subscription_id',
+			$params,
 			$rangeInfo
 		);
 		return new DAOResultFactory($result, $this, '_fromRow');
@@ -474,7 +457,7 @@ class IndividualSubscriptionDAO extends SubscriptionDAO {
 	 * @param $journalId int
 	 * @param $check int Check using either start date, end date, or both (default)
 	 * @param $checkDate date (YYYY-MM-DD) Use this date instead of current date
-	 * @return int
+	 * @return boolean
 	 */
 	function isValidIndividualSubscription($userId, $journalId, $check = SUBSCRIPTION_DATE_BOTH, $checkDate = null) {
 		if (empty($userId) || empty($journalId)) {
@@ -517,7 +500,7 @@ class IndividualSubscriptionDAO extends SubscriptionDAO {
 			)
 		);
 
-		if ($result->RecordCount() != 0) $returner = $result->fields[0];
+		if ($result->RecordCount() != 0) $returner = (boolean) $result->fields[0];
 		else $returner = false;
 
 		$result->Close();
@@ -532,25 +515,32 @@ class IndividualSubscriptionDAO extends SubscriptionDAO {
 	 * @return object DAOResultFactory containing matching IndividualSubscriptions
 	 */
 	function getByDateEnd($dateEnd, $journalId, $rangeInfo = null) {
+		$userDao = DAORegistry::getDAO('UserDAO'); /* @var $userDao UserDAO */
 		$dateEnd = explode('-', $dateEnd);
+		$params = array_merge(
+			$userDao->getFetchParameters(),
+			array(
+				$dateEnd[0],
+				$dateEnd[1],
+				$dateEnd[2],
+				(int) $journalId
+		));
+
 		$result = $this->retrieveRange(
-			'SELECT	s.*
+			'SELECT	s.*,
+			' . $userDao->getFetchColumns() .'
 			FROM	subscriptions s
 				JOIN subscription_types st ON (s.type_id = st.type_id)
 				JOIN users u ON (u.user_id = s.user_id)
+				' . $userDao->getFetchJoins() .'
 			WHERE	s.status = ' . SUBSCRIPTION_STATUS_ACTIVE . '
 				AND st.institutional = 0
 				AND EXTRACT(YEAR FROM s.date_end) = ?
 				AND EXTRACT(MONTH FROM s.date_end) = ?
 				AND EXTRACT(DAY FROM s.date_end) = ?
 				AND s.journal_id = ?
-			ORDER BY u.last_name ASC, s.subscription_id',
-			array(
-				$dateEnd[0],
-				$dateEnd[1],
-				$dateEnd[2],
-				(int) $journalId
-			),
+			' . $userDao->getOrderBy() .', s.subscription_id',
+			$params,
 			$rangeInfo
 		);
 		return new DAOResultFactory($result, $this, '_fromRow');
@@ -567,4 +557,4 @@ class IndividualSubscriptionDAO extends SubscriptionDAO {
 	}
 }
 
-?>
+

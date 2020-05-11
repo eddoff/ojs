@@ -3,9 +3,9 @@
 /**
  * @file controllers/grid/settings/sections/SectionGridHandler.inc.php
  *
- * Copyright (c) 2014-2018 Simon Fraser University
- * Copyright (c) 2003-2018 John Willinsky
- * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2020 Simon Fraser University
+ * Copyright (c) 2003-2020 John Willinsky
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class SectionGridHandler
  * @ingroup controllers_grid_settings_section
@@ -33,7 +33,7 @@ class SectionGridHandler extends SetupGridHandler {
 	// Overridden template methods
 	//
 	/**
-	 * @copydoc GridHandler::initialize()
+	 * @copydoc SetupGridHandler::initialize()
 	 */
 	function initialize($request, $args = null) {
 		parent::initialize($request, $args);
@@ -51,8 +51,8 @@ class SectionGridHandler extends SetupGridHandler {
 		$this->setTitle('section.sections');
 
 		// Elements to be displayed in the grid
-		$sectionDao = DAORegistry::getDAO('SectionDAO');
-		$subEditorsDao = DAORegistry::getDAO('SubEditorsDAO');
+		$sectionDao = DAORegistry::getDAO('SectionDAO'); /* @var $sectionDao SectionDAO */
+		$subEditorsDao = DAORegistry::getDAO('SubEditorsDAO'); /* @var $subEditorsDao SubEditorsDAO */
 		$sectionIterator = $sectionDao->getByJournalId($journal->getId());
 
 		$gridData = array();
@@ -64,7 +64,7 @@ class SectionGridHandler extends SetupGridHandler {
 			} else {
 				$editors = array();
 				foreach ($assignedSubEditors as $subEditor) {
-					$editors[] = $subEditor->getLastName();
+					$editors[] = $subEditor->getFullName();
 				}
 				$editorsString = implode(', ', $editors);
 			}
@@ -138,7 +138,7 @@ class SectionGridHandler extends SetupGridHandler {
 	 * @copydoc GridHandler::setDataElementSequence()
 	 */
 	function setDataElementSequence($request, $rowId, $gridDataElement, $newSequence) {
-		$sectionDao = DAORegistry::getDAO('SectionDAO');
+		$sectionDao = DAORegistry::getDAO('SectionDAO'); /* @var $sectionDao SectionDAO */
 		$journal = $request->getJournal();
 		$section = $sectionDao->getById($rowId, $journal->getId());
 		$section->setSequence($newSequence);
@@ -172,7 +172,7 @@ class SectionGridHandler extends SetupGridHandler {
 
 		import('controllers.grid.settings.sections.form.SectionForm');
 		$sectionForm = new SectionForm($request, $sectionId);
-		$sectionForm->initData($args, $request);
+		$sectionForm->initData();
 		return new JSONMessage(true, $sectionForm->fetch($request));
 	}
 
@@ -190,7 +190,9 @@ class SectionGridHandler extends SetupGridHandler {
 		$sectionForm->readInputData();
 
 		if ($sectionForm->validate()) {
-			$sectionForm->execute($args, $request);
+			$sectionForm->execute();
+			$notificationManager = new NotificationManager();
+			$notificationManager->createTrivialNotification($request->getUser()->getId());
 			return DAO::getDataChangedEvent($sectionForm->getSectionId());
 		}
 		return new JSONMessage(false);
@@ -205,7 +207,7 @@ class SectionGridHandler extends SetupGridHandler {
 	function deleteSection($args, $request) {
 		$journal = $request->getJournal();
 
-		$sectionDao = DAORegistry::getDAO('SectionDAO');
+		$sectionDao = DAORegistry::getDAO('SectionDAO'); /* @var $sectionDao SectionDAO */
 		$section = $sectionDao->getById(
 			$request->getUserVar('sectionId'),
 			$journal->getId()
@@ -220,8 +222,8 @@ class SectionGridHandler extends SetupGridHandler {
 		}
 
 		AppLocale::requireComponents(LOCALE_COMPONENT_PKP_MANAGER);
-		$articleDao = DAORegistry::getDAO('ArticleDAO');
-		$checkSubmissions = $articleDao->retrieve('SELECT submission_id FROM submissions WHERE section_id = ? AND context_id = ?', array((int) $request->getUserVar('sectionId'), (int) $journal->getId()));
+		$submissionDao = DAORegistry::getDAO('SubmissionDAO'); /* @var $submissionDao SubmissionDAO */
+		$checkSubmissions = $submissionDao->retrieve('SELECT p.publication_id FROM publications p JOIN submissions s ON (s.submission_id = p.submission_id) WHERE p.section_id = ? AND s.context_id = ?', array((int) $request->getUserVar('sectionId'), (int) $journal->getId()));
 
 		if ($checkSubmissions->numRows() > 0) {
 			return new JSONMessage(false, __('manager.sections.alertDelete'));
@@ -233,4 +235,4 @@ class SectionGridHandler extends SetupGridHandler {
 	}
 }
 
-?>
+

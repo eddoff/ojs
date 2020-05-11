@@ -3,9 +3,9 @@
 /**
  * @file plugins/generic/webFeed/WebFeedPlugin.inc.php
  *
- * Copyright (c) 2014-2018 Simon Fraser University
- * Copyright (c) 2003-2018 John Willinsky
- * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2020 Simon Fraser University
+ * Copyright (c) 2003-2020 John Willinsky
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class WebFeedPlugin
  * @ingroup plugins_block_webFeed
@@ -36,22 +36,16 @@ class WebFeedPlugin extends GenericPlugin {
 	 * @copydoc Plugin::register()
 	 */
 	public function register($category, $path, $mainContextId = null) {
-		if (parent::register($category, $path, $mainContextId)) {
-			if ($this->getEnabled($mainContextId)) {
-				HookRegistry::register('TemplateManager::display',array($this, 'callbackAddLinks'));
-				$this->import('WebFeedBlockPlugin');
-				$blockPlugin = new WebFeedBlockPlugin($this);
-				PluginRegistry::register('blocks', $blockPlugin, $this->getPluginPath());
+		if (!parent::register($category, $path, $mainContextId)) return false;
+		if ($this->getEnabled($mainContextId)) {
+			HookRegistry::register('TemplateManager::display',array($this, 'callbackAddLinks'));
+			$this->import('WebFeedBlockPlugin');
+			PluginRegistry::register('blocks', new WebFeedBlockPlugin($this), $this->getPluginPath());
 
-				$this->import('WebFeedGatewayPlugin');
-				$gatewayPlugin = new WebFeedGatewayPlugin($this);
-				PluginRegistry::register('gateways', $gatewayPlugin, $this->getPluginPath());
-
-				$this->_registerTemplateResource();
-			}
-			return true;
+			$this->import('WebFeedGatewayPlugin');
+			PluginRegistry::register('gateways', new WebFeedGatewayPlugin($this), $this->getPluginPath());
 		}
-		return false;
+		return true;
 	}
 
 	/**
@@ -64,26 +58,19 @@ class WebFeedPlugin extends GenericPlugin {
 	}
 
 	/**
-	 * @copydoc PKPPlugin::getTemplatePath
-	 */
-	public function getTemplatePath($inCore = false) {
-		return $this->getTemplateResourceName() . ':templates/';
-	}
-
-	/**
 	 * Add feed links to page <head> on select/all pages.
 	 */
 	public function callbackAddLinks($hookName, $args) {
 		// Only page requests will be handled
-		$request = $this->getRequest();
+		$request = Application::get()->getRequest();
 		if (!is_a($request->getRouter(), 'PKPPageRouter')) return false;
 
 		$templateManager =& $args[0];
-		$currentJournal = $templateManager->get_template_vars('currentJournal');
+		$currentJournal = $templateManager->getTemplateVars('currentJournal');
 		if (is_null($currentJournal)) {
 			return;
 		}
-		$issueDao = DAORegistry::getDAO('IssueDAO');
+		$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
 		$currentIssue = $issueDao->getCurrent($currentJournal->getId(), true);
 
 		if (!$currentIssue) {

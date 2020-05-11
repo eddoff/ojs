@@ -3,9 +3,9 @@
 /**
  * @file plugins/importexport/pubmed/tests/functional/FunctionalPubmedExportTest.php
  *
- * Copyright (c) 2014-2018 Simon Fraser University
- * Copyright (c) 2000-2018 John Willinsky
- * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2020 Simon Fraser University
+ * Copyright (c) 2000-2020 John Willinsky
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class FunctionalPubmedExportTest
  * @ingroup plugins_importexport_pubmed_tests_functional
@@ -22,4 +22,4 @@ class FunctionalPubmedExportTest extends FunctionalImportExportBaseTestCase {
 		self::assertEquals('10.1234/t.v1i1.1', $export->evaluate('string(/ArticleSet/Article/ELocationID[@EIdType="doi"])'));
 	}
 }
-?>
+
