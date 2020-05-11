@@ -3,9 +3,9 @@
 /**
  * @file controllers/grid/users/subscriberSelect/SubscriberSelectGridHandler.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2000-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class SubscriberSelectGridHandler
  * @ingroup controllers_grid_users_subscriberSelect
@@ -58,7 +58,7 @@ class SubscriberSelectGridHandler extends GridHandler {
 		);
 
 		$stageId = $this->getAuthorizedContextObject(ASSOC_TYPE_WORKFLOW_STAGE);
-		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
+		$userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 		$userGroups = $userGroupDao->getUserGroupsByStage(
 			$request->getContext()->getId(),
 			$stageId
@@ -113,7 +113,7 @@ class SubscriberSelectGridHandler extends GridHandler {
 	 * @copydoc GridHandler::loadData()
 	 */
 	protected function loadData($request, $filter) {
-		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
+		$userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 		return $users = $userGroupDao->getUsersById(
 			$filter['userGroup'],
 			$request->getContext()->getId(),
@@ -127,9 +127,9 @@ class SubscriberSelectGridHandler extends GridHandler {
 	/**
 	 * @copydoc GridHandler::renderFilter()
 	 */
-	function renderFilter($request, $filterData = array()) {
+	function renderFilter($request) {
 		$context = $request->getContext();
-		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
+		$userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 		$userGroups = $userGroupDao->getByContextId($context->getId());
 		$userGroupOptions = array('' => __('grid.user.allRoles'));
 		while ($userGroup = $userGroups->next()) {
@@ -152,7 +152,7 @@ class SubscriberSelectGridHandler extends GridHandler {
 		// If we're editing an existing subscription, use the filter form to ensure that
 		// the already-selected user is chosen.
 		if (($userId = $request->getUserVar('userId')) && !$request->getUserVar('clientSubmit')) {
-			$userDao = DAORegistry::getDAO('UserDAO'); /* @var $userDao UserDAO */
+			$userDao = DAORegistry::getDAO('UserDAO');
 			$user = $userDao->getById($userId);
 			return array(
 				'userGroup' => null,
@@ -198,11 +198,11 @@ class SubscriberSelectGridHandler extends GridHandler {
 	 * @copydoc GridHandler::getRequestArgs()
 	 */
 	function getRequestArgs() {
-		$request = Application::get()->getRequest();
+		$request = Application::getRequest();
 		return array_merge(parent::getRequestArgs(), array(
 			'userId' => $request->getUserVar('userId'),
 		));
 	}
 }
 
-
+?>

@@ -3,9 +3,9 @@
 /**
  * @file pages/submission/SubmissionHandler.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class SubmissionHandler
  * @ingroup pages_submission
@@ -38,18 +38,14 @@ class SubmissionHandler extends PKPSubmissionHandler {
 	 */
 	function fetchChoices($args, $request) {
 		$term = $request->getUserVar('term');
-		$locale = $request->getUserVar('locale');
-		if (!$locale) {
-			$locale = AppLocale::getLocale();
-		}
 		switch ($request->getUserVar('list')) {
 			case 'languages':
-				$isoCodes = new \Sokil\IsoCodes\IsoCodesFactory(\Sokil\IsoCodes\IsoCodesFactory::OPTIMISATION_IO);
+				$languageDao = DAORegistry::getDAO('LanguageDAO');
+				$languages = $languageDao->getLanguages(AppLocale::getLocale());
 				$matches = array();
-				foreach ($isoCodes->getLanguages() as $language) {
-					if (!$language->getAlpha2() || $language->getType() != 'L' || $language->getScope() != 'I') continue;
-					if (stristr($language->getLocalName(), $term)) $matches[$language->getAlpha3()] = $language->getLocalName();
-				};
+				foreach ($languages as $language) {
+					if (stristr($language->getName(), $term)) $matches[$language->getCode()] = $language->getName();
+				}
 				header('Content-Type: text/json');
 				echo json_encode($matches);
 		}
@@ -92,4 +88,4 @@ class SubmissionHandler extends PKPSubmissionHandler {
 	}
 }
 
-
+?>

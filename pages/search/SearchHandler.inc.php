@@ -3,9 +3,9 @@
 /**
  * @file pages/search/SearchHandler.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class SearchHandler
  * @ingroup pages_search
@@ -67,7 +67,7 @@ class SearchHandler extends Handler {
 			$day = $request->getUserVar("date${fromTo}Day");
 			$year = $request->getUserVar("date${fromTo}Year");
 			if (empty($year)) {
-				$date = NULL;
+				$date = '--';
 				$hasEmptyFilters = true;
 			} else {
 				$defaultMonth = ($fromTo == 'From' ? 1 : 12);
@@ -90,7 +90,8 @@ class SearchHandler extends Handler {
 		}
 
 		// Assign the year range.
-		$yearRange = Services::get('publication')->getDateBoundaries(['contextIds' => $journalId]);
+		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
+		$yearRange = $publishedArticleDao->getArticleYearRange($journalId);
 		$yearStart = substr($yearRange[1], 0, 4);
 		$yearEnd = substr($yearRange[0], 0, 4);
 		$templateMgr->assign(array(
@@ -180,7 +181,7 @@ class SearchHandler extends Handler {
 	}
 
 	/**
-	 * Show index of published submissions by author.
+	 * Show index of published articles by author.
 	 * @param $args array
 	 * @param $request PKPRequest
 	 */
@@ -191,33 +192,17 @@ class SearchHandler extends Handler {
 		$journal = $request->getJournal();
 		$user = $request->getUser();
 
-		$authorDao = DAORegistry::getDAO('AuthorDAO'); /* @var $authorDao AuthorDAO */
+		$authorDao = DAORegistry::getDAO('AuthorDAO');
 
 		if (isset($args[0]) && $args[0] == 'view') {
 			// View a specific author
-			$authorName = $request->getUserVar('authorName');
-			$givenName = $request->getUserVar('givenName');
-			$familyName = $request->getUserVar('familyName');
+			$firstName = $request->getUserVar('firstName');
+			$middleName = $request->getUserVar('middleName');
+			$lastName = $request->getUserVar('lastName');
 			$affiliation = $request->getUserVar('affiliation');
 			$country = $request->getUserVar('country');
 
-			$authorRecords = iterator_to_array(Services::get('author')->getMany([
-				'contextIds' => $journal?[$journal->getId()]:[],
-				'givenName' => $givenName,
-				'familyName' => $familyName,
-				'affiliation' => $affiliation,
-				'country' => $country,
-			]));
-			$publicationIds = array_map(function($author) {
-				return $author->getData('publicationId');
-			}, $authorRecords);
-			$submissionIds = array_filter(array_map(function($publicationId) {
-				$publication = Services::get('publication')->get($publicationId);
-				return $publication->getData('status') == STATUS_PUBLISHED ? $publication->getData('submissionId') : null;
-			}, array_unique($publicationIds)));
-			$submissions = array_map(function($submissionId) {
-				return Services::get('submission')->get($submissionId);
-			}, array_unique($submissionIds));
+			$publishedArticles = $authorDao->getPublishedArticlesForAuthor($journal?$journal->getId():null, $firstName, $middleName, $lastName, $affiliation, $country);
 
 			// Load information associated with each article.
 			$journals = array();
@@ -225,15 +210,15 @@ class SearchHandler extends Handler {
 			$sections = array();
 			$issuesUnavailable = array();
 
-			$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-			$sectionDao = DAORegistry::getDAO('SectionDAO'); /* @var $sectionDao SectionDAO */
-			$journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
+			$issueDao = DAORegistry::getDAO('IssueDAO');
+			$sectionDao = DAORegistry::getDAO('SectionDAO');
+			$journalDao = DAORegistry::getDAO('JournalDAO');
 
-			foreach ($submissions as $article) {
+			foreach ($publishedArticles as $article) {
 				$articleId = $article->getId();
-				$issueId = $article->getCurrentPublication()->getData('issueId');
+				$issueId = $article->getIssueId();
 				$sectionId = $article->getSectionId();
-				$journalId = $article->getData('contextId');
+				$journalId = $article->getJournalId();
 
 				if (!isset($journals[$journalId])) {
 					$journals[$journalId] = $journalDao->getById($journalId);
@@ -250,27 +235,26 @@ class SearchHandler extends Handler {
 				}
 			}
 
-			if (empty($submissions)) {
+			if (empty($publishedArticles)) {
 				$request->redirect(null, $request->getRequestedPage());
 			}
 
 			$templateMgr = TemplateManager::getManager($request);
 			$templateMgr->assign(array(
-				'submissions' => $submissions,
+				'publishedArticles' => $publishedArticles,
 				'issues' => $issues,
 				'issuesUnavailable' => $issuesUnavailable,
 				'sections' => $sections,
 				'journals' => $journals,
-				'givenName' => $givenName,
-				'familyName' => $familyName,
+				'firstName' => $firstName,
+				'middleName' => $middleName,
+				'lastName' => $lastName,
 				'affiliation' => $affiliation,
-				'authorName' => $authorName
 			));
 
-			$isoCodes = new \Sokil\IsoCodes\IsoCodesFactory();
-			$countries = $countries = $isoCodes->getCountries();
-			$country = $countries->getByAlpha2($country);
-			$templateMgr->assign('country', $country?$country->getLocalName():'');
+			$countryDao = DAORegistry::getDAO('CountryDAO');
+			$country = $countryDao->getCountry($country);
+			$templateMgr->assign('country', $country);
 
 			$templateMgr->display('frontend/pages/searchAuthorDetails.tpl');
 		} else {
@@ -287,7 +271,7 @@ class SearchHandler extends Handler {
 			$templateMgr = TemplateManager::getManager($request);
 			$templateMgr->assign(array(
 				'searchInitial' => $request->getUserVar('searchInitial'),
-				'alphaList' => array_merge(array('-'), explode(' ', __('common.alphaList'))),
+				'alphaList' => explode(' ', __('common.alphaList')),
 				'authors' => $authors,
 			));
 			$templateMgr->display('frontend/pages/searchAuthorIndex.tpl');
@@ -302,10 +286,10 @@ class SearchHandler extends Handler {
 		parent::setupTemplate($request);
 		$templateMgr = TemplateManager::getManager($request);
 		$journal = $request->getJournal();
-		if (!$journal || !$journal->getData('restrictSiteAccess')) {
+		if (!$journal || !$journal->getSetting('restrictSiteAccess')) {
 			$templateMgr->setCacheability(CACHEABILITY_PUBLIC);
 		}
 	}
 }
 
-
+?>

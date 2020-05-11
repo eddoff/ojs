@@ -3,9 +3,9 @@
 /**
  * @file pages/payments/PaymentsHandler.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class PaymentsHandler
  * @ingroup pages_payments
@@ -115,7 +115,11 @@ class PaymentsHandler extends Handler {
 		$templateMgr->assign('acceptSubscriptionPayments', $paymentManager->isConfigured());
 
 		$subscriptionPolicyForm = new SubscriptionPolicyForm();
-		$subscriptionPolicyForm->initData();
+		if ($subscriptionPolicyForm->isLocaleResubmit()) {
+			$subscriptionPolicyForm->readInputData();
+		} else {
+			$subscriptionPolicyForm->initData();
+		}
 		return new JSONMessage(true, $subscriptionPolicyForm->fetch($request));
 	}
 
@@ -153,7 +157,11 @@ class PaymentsHandler extends Handler {
 		import('classes.subscription.form.PaymentTypesForm');
 
 		$paymentTypesForm = new PaymentTypesForm();
-		$paymentTypesForm->initData();
+		if ($paymentTypesForm->isLocaleResubmit()) {
+			$paymentTypesForm->readInputData();
+		} else {
+			$paymentTypesForm->initData($request->getContext());
+		}
 		return new JSONMessage(true, $paymentTypesForm->fetch($request));
 	}
 
@@ -170,7 +178,7 @@ class PaymentsHandler extends Handler {
 		$paymentTypesForm = new PaymentTypesForm();
 		$paymentTypesForm->readInputData();
 		if ($paymentTypesForm->validate()) {
-			$paymentTypesForm->execute();
+			$paymentTypesForm->execute($request);
 			$notificationManager = new NotificationManager();
 			$user = $request->getUser();
 			$notificationManager->createTrivialNotification($user->getId());

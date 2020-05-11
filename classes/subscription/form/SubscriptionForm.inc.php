@@ -3,9 +3,9 @@
 /**
  * @file classes/subscription/form/SubscriptionForm.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class SubscriptionForm
  * @ingroup subscription
@@ -37,7 +37,7 @@ class SubscriptionForm extends Form {
 	 * @param $template string? Template to use for form presentation
 	 * @param $subscriptionId int The subscription ID for this subscription; null for new subscription
 	 */
-	public function __construct($template, $subscriptionId = null) {
+	function __construct($template, $subscriptionId = null) {
 		parent::__construct($template);
 
 		$subscriptionId = isset($subscriptionId) ? (int) $subscriptionId : null;
@@ -48,17 +48,13 @@ class SubscriptionForm extends Form {
 		import('classes.subscription.SubscriptionDAO');
 		$this->validStatus = SubscriptionDAO::getStatusOptions();
 
-		$isoCodes = new \Sokil\IsoCodes\IsoCodesFactory();
-		$this->validCountries = array();
-		foreach ($isoCodes->getCountries() as $country) {
-			$this->validCountries[$country->getAlpha2()] = $country->getLocalName();
-		}
-		asort($this->validCountries);
+		$countryDao = DAORegistry::getDAO('CountryDAO');
+		$this->validCountries =& $countryDao->getCountries();
 
 		// User is provided and valid
 		$this->addCheck(new FormValidator($this, 'userId', 'required', 'manager.subscriptions.form.userIdRequired'));
 		$this->addCheck(new FormValidatorCustom($this, 'userId', 'required', 'manager.subscriptions.form.userIdValid', function($userId) {
-			$userDao = DAORegistry::getDAO('UserDAO'); /* @var $userDao UserDAO */
+			$userDao = DAORegistry::getDAO('UserDAO');
 			return $userDao->userExistsById($userId);
 		}));
 
@@ -76,9 +72,9 @@ class SubscriptionForm extends Form {
 
 	/**
 	 * Display the form.
-	 * @copydoc Form::fetch
+	 * @param $request PKPRequest
 	 */
-	public function fetch($request, $template = null, $display = false) {
+	function fetch($request) {
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign(array(
 			'subscriptionId' => $this->subscription?$this->subscription->getId():null,
@@ -87,13 +83,13 @@ class SubscriptionForm extends Form {
 			'validStatus' => $this->validStatus,
 			'subscriptionTypes' => $this->subscriptionTypes,
 		));
-		return parent::fetch($request, $template, $display);
+		return parent::fetch($request);
 	}
 
 	/**
 	 * Initialize form data from current subscription.
 	 */
-	public function initData() {
+	function initData() {
 		if (isset($this->subscription)) {
 			$subscription = $this->subscription;
 			$this->_data = array(
@@ -112,11 +108,11 @@ class SubscriptionForm extends Form {
 	/**
 	 * Assign form data to user-submitted data.
 	 */
-	public function readInputData() {
-		$this->readUserVars(array('status', 'userId', 'typeId', 'membership', 'referenceNumber', 'notes', 'notifyEmail', 'dateStart', 'dateEnd'));
+	function readInputData() {
+		$this->readUserVars(array('status', 'userId', 'typeId', 'dateStartYear', 'dateStartMonth', 'dateStartDay', 'dateEndYear', 'dateEndMonth', 'dateEndDay', 'membership', 'referenceNumber', 'notes', 'notifyEmail', 'dateStart', 'dateEnd'));
 
 		// If subscription type requires it, membership is provided
-		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO'); /* @var $subscriptionTypeDao SubscriptionTypeDAO */
+		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO');
 		$needMembership = $subscriptionTypeDao->getSubscriptionTypeMembership($this->getData('typeId'));
 
 		if ($needMembership) {
@@ -160,37 +156,26 @@ class SubscriptionForm extends Form {
 				$dateEndDay = strftime('%d', strtotime($dateEnd));
 				return ($dateEndDay >= 1 && $dateEndDay <= 31);
 			}));
-		} else {
-			// Is non-expiring; ensure that start/end dates weren't entered.
-			$this->addCheck(new FormValidatorCustom($this, 'dateStart', 'optional', 'manager.subscriptions.form.dateStartEmpty', function($dateStart) {
-				return empty($dateStart);
-			}));
-			$this->addCheck(new FormValidatorCustom($this, 'dateEnd', 'optional', 'manager.subscriptions.form.dateEndEmpty', function($dateEnd) {
-				return empty($dateEnd);
-			}));
 		}
 
 		// If notify email is requested, ensure subscription contact name and email exist.
 		if ($this->_data['notifyEmail'] == 1) {
 			$this->addCheck(new FormValidatorCustom($this, 'notifyEmail', 'required', 'manager.subscriptions.form.subscriptionContactRequired', function() {
-				$request = Application::get()->getRequest();
-				$journal = $request->getJournal();
-				$subscriptionName = $journal->getData('subscriptionName');
-				$subscriptionEmail = $journal->getData('subscriptionEmail');
+				$journal = Request::getJournal();
+				$journalSettingsDao = DAORegistry::getDAO('JournalSettingsDAO');
+				$subscriptionName = $journalSettingsDao->getSetting($journal->getId(), 'subscriptionName');
+				$subscriptionEmail = $journalSettingsDao->getSetting($journal->getId(), 'subscriptionEmail');
 				return $subscriptionName != '' && $subscriptionEmail != '';
 			}));
 		}
 	}
 
 	/**
-	 * @copydoc Form::execute
+	 * Save subscription.
 	 */
-	public function execute(...$functionArgs) {
-		$request = Application::get()->getRequest();
-		$journal = $request->getJournal();
+	function execute() {
+		$journal = Request::getJournal();
 		$subscription =& $this->subscription;
-
-		parent::execute(...$functionArgs);
 
 		$subscription->setJournalId($journal->getId());
 		$subscription->setStatus($this->getData('status'));
@@ -200,7 +185,7 @@ class SubscriptionForm extends Form {
 		$subscription->setReferenceNumber($this->getData('referenceNumber') ? $this->getData('referenceNumber') : null);
 		$subscription->setNotes($this->getData('notes') ? $this->getData('notes') : null);
 
-		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO'); /* @var $subscriptionTypeDao SubscriptionTypeDAO */
+		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO');
 		$subscriptionType = $subscriptionTypeDao->getById($subscription->getTypeId());
 		if (!$subscriptionType->getNonExpiring()) {
 			$subscription->setDateStart($this->getData('dateStart'));
@@ -212,20 +197,21 @@ class SubscriptionForm extends Form {
 	 * Internal function to prepare notification email
 	 * @param $emailTemplateKey string
 	 */
-	protected function _prepareNotificationEmail($mailTemplateKey) {
-		$userDao = DAORegistry::getDAO('UserDAO'); /* @var $userDao UserDAO */
-		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO'); /* @var $subscriptionTypeDao SubscriptionTypeDAO */
+	function _prepareNotificationEmail($mailTemplateKey) {
+		$userDao = DAORegistry::getDAO('UserDAO');
+		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO');
+		$journalSettingsDao = DAORegistry::getDAO('JournalSettingsDAO');
 
-		$request = Application::get()->getRequest();
-		$journal = $request->getJournal();
+		$journal = Request::getJournal();
 		$journalName = $journal->getLocalizedTitle();
+		$journalId = $journal->getId();
 		$user = $userDao->getById($this->subscription->getUserId());
 		$subscriptionType = $subscriptionTypeDao->getById($this->subscription->getTypeId());
 
-		$subscriptionName = $journal->getData('subscriptionName');
-		$subscriptionEmail = $journal->getData('subscriptionEmail');
-		$subscriptionPhone = $journal->getData('subscriptionPhone');
-		$subscriptionMailingAddress = $journal->getData('subscriptionMailingAddress');
+		$subscriptionName = $journalSettingsDao->getSetting($journalId, 'subscriptionName');
+		$subscriptionEmail = $journalSettingsDao->getSetting($journalId, 'subscriptionEmail');
+		$subscriptionPhone = $journalSettingsDao->getSetting($journalId, 'subscriptionPhone');
+		$subscriptionMailingAddress = $journalSettingsDao->getSetting($journalId, 'subscriptionMailingAddress');
 		$subscriptionContactSignature = $subscriptionName;
 
 		if ($subscriptionMailingAddress != '') {
@@ -257,4 +243,4 @@ class SubscriptionForm extends Form {
 	}
 }
 
-
+?>

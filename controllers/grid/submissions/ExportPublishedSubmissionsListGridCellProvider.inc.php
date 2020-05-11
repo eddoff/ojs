@@ -3,9 +3,9 @@
 /**
  * @file controllers/grid/submissions/ExportPublishedSubmissionsListGridCellProvider.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2000-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class ExportPublishedSubmissionsListGridCellProvider
  * @ingroup controllers_grid_submissions
@@ -39,35 +39,35 @@ class ExportPublishedSubmissionsListGridCellProvider extends DataObjectGridCellP
 	 * @copydoc GridCellProvider::getCellActions()
 	 */
 	function getCellActions($request, $row, $column, $position = GRID_ACTION_POSITION_DEFAULT) {
-		$submission = $row->getData();
+		$publishedSubmission = $row->getData();
 		$columnId = $column->getId();
-		assert(is_a($submission, 'Submission') && !empty($columnId));
+		assert(is_a($publishedSubmission, 'PublishedArticle') && !empty($columnId));
 
 		import('lib.pkp.classes.linkAction.request.RedirectAction');
 		switch ($columnId) {
 			case 'title':
 				$this->_titleColumn = $column;
-				$title = $submission->getLocalizedTitle();
+				$title = $publishedSubmission->getLocalizedTitle();
 				if (empty($title)) $title = __('common.untitled');
-				$authorsInTitle = $submission->getShortAuthorString();
+				$authorsInTitle = $publishedSubmission->getShortAuthorString();
 				$title = $authorsInTitle . '; ' . $title;
-				import('classes.core.Services');
+				import('classes.core.ServicesContainer');
 				return array(
 					new LinkAction(
 						'itemWorkflow',
 						new RedirectAction(
-							Services::get('submission')->getWorkflowUrlByUserRoles($submission)
+							ServicesContainer::instance()->get('submission')->getWorkflowUrlByUserRoles($publishedSubmission)
 						),
-						htmlspecialchars($title)
+						$title
 					)
 				);
 			case 'issue':
-				$contextId = $submission->getContextId();
-				$issueId = $submission->getCurrentPublication()->getData('issueId');
-				$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
+				$contextId = $publishedSubmission->getContextId();
+				$issueId = $publishedSubmission->getIssueId();
+				$issueDao = DAORegistry::getDAO('IssueDAO');
 				$issue = $issueDao->getById($issueId, $contextId);
 				// Link to the issue edit modal
-				$application = Application::get();
+				$application = PKPApplication::getApplication();
 				$dispatcher = $application->getDispatcher();
 				import('lib.pkp.classes.linkAction.request.AjaxModal');
 				return array(
@@ -77,17 +77,26 @@ class ExportPublishedSubmissionsListGridCellProvider extends DataObjectGridCellP
 							$dispatcher->url($request, ROUTE_COMPONENT, null, 'grid.issues.BackIssueGridHandler', 'editIssue', null, array('issueId' => $issue->getId())),
 							__('plugins.importexport.common.settings.DOIPluginSettings')
 						),
-						htmlspecialchars($issue->getIssueIdentification()),
+						$issue->getIssueIdentification(),
 						null
 					)
 				);
 			case 'status':
-				$status = $submission->getData($this->_plugin->getDepositStatusSettingName());
+				$status = $publishedSubmission->getData($this->_plugin->getDepositStatusSettingName());
 				$statusNames = $this->_plugin->getStatusNames();
-				$statusActions = $this->_plugin->getStatusActions($submission);
+				$statusActions = $this->_plugin->getStatusActions($publishedSubmission);
 				if ($status && array_key_exists($status, $statusActions)) {
 					assert(array_key_exists($status, $statusNames));
-					return array($statusActions[$status]);
+					return array(
+						new LinkAction(
+							'edit',
+							new RedirectAction(
+								$statusActions[$status],
+								'_blank'
+							),
+							$statusNames[$status]
+						)
+					);
 				}
 		}
 		return parent::getCellActions($request, $row, $column, $position);
@@ -100,21 +109,21 @@ class ExportPublishedSubmissionsListGridCellProvider extends DataObjectGridCellP
 	 * @copydoc DataObjectGridCellProvider::getTemplateVarsFromRowColumn()
 	 */
 	function getTemplateVarsFromRowColumn($row, $column) {
-		$submission = $row->getData();
+		$publishedSubmission = $row->getData();
 		$columnId = $column->getId();
-		assert(is_a($submission, 'Submission') && !empty($columnId));
+		assert(is_a($publishedSubmission, 'PublishedArticle') && !empty($columnId));
 
 		switch ($columnId) {
 			case 'id':
-				return array('label' => $submission->getId());
+				return array('label' => $publishedSubmission->getId());
 			case 'title':
 				return array('label' => '');
 			case 'issue':
 				return array('label' => '');
 			case 'status':
-				$status = $submission->getData($this->_plugin->getDepositStatusSettingName());
+				$status = $publishedSubmission->getData($this->_plugin->getDepositStatusSettingName());
 				$statusNames = $this->_plugin->getStatusNames();
-				$statusActions = $this->_plugin->getStatusActions($submission);
+				$statusActions = $this->_plugin->getStatusActions($publishedSubmission);
 				if ($status) {
 					if (array_key_exists($status, $statusActions)) {
 						$label = '';
@@ -131,4 +140,4 @@ class ExportPublishedSubmissionsListGridCellProvider extends DataObjectGridCellP
 
 }
 
-
+?>

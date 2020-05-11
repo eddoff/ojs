@@ -3,9 +3,9 @@
 /**
  * @file pages/reviewer/ReviewerHandler.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class ReviewerHandler
  * @ingroup pages_reviewer
@@ -34,7 +34,7 @@ class ReviewerHandler extends PKPReviewerHandler {
 	 */
 	function authorize($request, &$args, $roleAssignments) {
 		$context = $request->getContext();
-		if ($context->getData('reviewerAccessKeysEnabled')) {
+		if ($context->getSetting('reviewerAccessKeysEnabled')) {
 			$this->_validateAccessKey($request);
 		}
 
@@ -43,7 +43,9 @@ class ReviewerHandler extends PKPReviewerHandler {
 		$this->addPolicy(new SubmissionAccessPolicy(
 			$request,
 			$args,
-			$roleAssignments
+			$roleAssignments,
+			'submissionId',
+			$router->getRequestedOp($request)=='submission' || (in_array($router->getRequestedOp($request), array('step', 'saveStep')) && $request->getUserVar('step') == 1) // Limit declined review views to step 1
 		));
 
 
@@ -68,7 +70,7 @@ class ReviewerHandler extends PKPReviewerHandler {
 		if ($session->getUserId()) { return false; }
 
 		import('lib.pkp.classes.security.AccessKeyManager');
-		$reviewerSubmissionDao = DAORegistry::getDAO('ReviewerSubmissionDAO'); /* @var $reviewerSubmissionDao ReviewerSubmissionDAO */
+		$reviewerSubmissionDao = DAORegistry::getDAO('ReviewerSubmissionDAO');
 		$reviewerSubmission = $reviewerSubmissionDao->getReviewerSubmission($reviewId);
 
 		// Validate the access key
@@ -83,7 +85,7 @@ class ReviewerHandler extends PKPReviewerHandler {
 		if (!$accessKey) { return false; }
 
 		// Get the reviewer user object
-		$userDao = DAORegistry::getDAO('UserDAO'); /* @var $userDao UserDAO */
+		$userDao = DAORegistry::getDAO('UserDAO');
 		$user = $userDao->getById($accessKey->getUserId());
 		if (!$user) { return false; }
 
@@ -97,4 +99,4 @@ class ReviewerHandler extends PKPReviewerHandler {
 	}
 }
 
-
+?>

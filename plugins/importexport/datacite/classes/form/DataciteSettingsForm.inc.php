@@ -3,9 +3,9 @@
 /**
  * @file plugins/importexport/datacite/classes/form/DataciteSettingsForm.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class DataciteSettingsForm
  * @ingroup plugins_importexport_datacite_classes_form
@@ -54,12 +54,12 @@ class DataciteSettingsForm extends Form {
 		$this->_contextId = $contextId;
 		$this->_plugin = $plugin;
 
-		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
+		parent::__construct($plugin->getTemplatePath() . 'settingsForm.tpl');
 
 		// DOI plugin settings action link
 		$pubIdPlugins = PluginRegistry::loadCategory('pubIds', true);
 		if (isset($pubIdPlugins['doipubidplugin'])) {
-			$application = Application::get();
+			$application = PKPApplication::getApplication();
 			$request = $application->getRequest();
 			$dispatcher = $application->getDispatcher();
 			import('lib.pkp.classes.linkAction.request.AjaxModal');
@@ -104,12 +104,11 @@ class DataciteSettingsForm extends Form {
 	}
 
 	/**
-	 * @copydoc Form::execute()
+	 * Execute the form.
 	 */
-	function execute(...$functionArgs) {
+	function execute() {
 		$plugin = $this->_getPlugin();
 		$contextId = $this->_getContextId();
-		parent::execute(...$functionArgs);
 		foreach($this->getFormFields() as $fieldName => $fieldType) {
 			$plugin->updateSetting($contextId, $fieldName, $this->getData($fieldName), $fieldType);
 		}
@@ -143,4 +142,4 @@ class DataciteSettingsForm extends Form {
 
 }
 
-
+?>

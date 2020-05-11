@@ -3,9 +3,9 @@
 /**
  * @file classes/subscription/SubscriptionType.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class Subscriptiontyoe
  * @ingroup subscription 
@@ -129,12 +129,17 @@ class SubscriptionType extends DataObject {
 
 	/**
 	 * Get subscription type currency string.
-	 * @return string
+	 * @return int
 	 */
-	public function getCurrencyString() {
-		$isoCodes = new \Sokil\IsoCodes\IsoCodesFactory();
-		$currency = $isoCodes->getCurrencies()->getByLetterCode($this->getData('currencyCodeAlpha'));
-		return $currency?$currency->getLocalName():'subscriptionTypes.currency';
+	function getCurrencyString() {
+		$currencyDao = DAORegistry::getDAO('CurrencyDAO');
+		$currency = $currencyDao->getCurrencyByAlphaCode($this->getData('currencyCodeAlpha'));
+
+		if ($currency != null) {
+			return $currency->getName();
+		} else {
+			return 'subscriptionTypes.currency';
+		}
 	}
 
 	/**
@@ -142,9 +147,14 @@ class SubscriptionType extends DataObject {
 	 * @return int
 	 */
 	function getCurrencyStringShort() {
-		$isoCodes = new \Sokil\IsoCodes\IsoCodesFactory();
-		$currency = $isoCodes->getCurrencies()->getByLetterCode($this->getData('currencyCodeAlpha'));
-		return $currency?$currency->getLetterCode():'subscriptionTypes.currency';
+		$currencyDao = DAORegistry::getDAO('CurrencyDAO');
+		$currency = $currencyDao->getCurrencyByAlphaCode($this->getData('currencyCodeAlpha'));
+
+		if ($currency != null) {
+			return $currency->getCodeAlpha();
+		} else {
+			return 'subscriptionTypes.currency';
+		}
 	}
 
 	/**
@@ -304,9 +314,9 @@ class SubscriptionType extends DataObject {
 	 * @return string
 	 */
 	function getSummaryString() {
-		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO'); /* @var $subscriptionTypeDao SubscriptionTypeDAO */
+		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO');
 		return $this->getLocalizedName() . ' - ' . $this->getDurationYearsMonths() . ' - ' . sprintf('%.2f', $this->getCost()) . ' ' . $this->getCurrencyStringShort();
 	}
 }
 
-
+?>

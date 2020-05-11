@@ -3,9 +3,9 @@
 /**
  * @file plugins/generic/announcementFeed/AnnouncementFeedGatewayPlugin.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class AnnouncementFeedGatewayPlugin
  * @ingroup plugins_generic_announcementFeed
@@ -66,6 +66,13 @@ class AnnouncementFeedGatewayPlugin extends GatewayPlugin {
 	}
 
 	/**
+	 * @copydoc PKPPlugin::getTemplatePath
+	 */
+	public function getTemplatePath($inCore = false) {
+		return $this->_parentPlugin->getTemplatePath($inCore);
+	}
+
+	/**
 	 * Get whether or not this plugin is enabled. (Should always return true, as the
 	 * parent plugin will take care of loading this one when needed)
 	 * @return boolean
@@ -85,7 +92,7 @@ class AnnouncementFeedGatewayPlugin extends GatewayPlugin {
 		if (!$journal) return false;
 
 		// Make sure announcements and plugin are enabled
-		$announcementsEnabled = $journal->getData('enableAnnouncements');
+		$announcementsEnabled = $journal->getSetting('enableAnnouncements');
 		if (!$announcementsEnabled || !$this->_parentPlugin->getEnabled()) return false;
 
 		// Make sure the feed type is specified and valid
@@ -105,7 +112,7 @@ class AnnouncementFeedGatewayPlugin extends GatewayPlugin {
 		// Get limit setting, if any
 		$recentItems = (int) $this->_parentPlugin->getSetting($journal->getId(), 'recentItems');
 
-		$announcementDao = DAORegistry::getDAO('AnnouncementDAO'); /* @var $announcementDao AnnouncementDAO */
+		$announcementDao = DAORegistry::getDAO('AnnouncementDAO');
 		$journalId = $journal->getId();
 		if ($recentItems > 0) {
 			import('lib.pkp.classes.db.DBResultRange');
@@ -132,7 +139,7 @@ class AnnouncementFeedGatewayPlugin extends GatewayPlugin {
 			}
 		}
 
-		$versionDao = DAORegistry::getDAO('VersionDAO'); /* @var $versionDao VersionDAO */
+		$versionDao = DAORegistry::getDAO('VersionDAO');
 		$version = $versionDao->getCurrentVersion();
 
 		$templateMgr = TemplateManager::getManager($request);
@@ -144,7 +151,7 @@ class AnnouncementFeedGatewayPlugin extends GatewayPlugin {
 			'journal' => $journal,
 		));
 
-		$templateMgr->display($this->_parentPlugin->getTemplateResource($typeMap[$type]), $mimeTypeMap[$type]);
+		$templateMgr->display($this->getTemplatePath() . $typeMap[$type], $mimeTypeMap[$type]);
 
 		return true;
 	}

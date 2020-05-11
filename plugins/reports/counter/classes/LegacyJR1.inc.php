@@ -15,16 +15,16 @@
 class LegacyJR1 {
 
 	/**
-	 * @var Plugin The COUNTER report plugin.
-	 */
-	var $_plugin;
+	 * @var string $_templatePath The location of the reportxml template
+	*/
+	var $_templatePath;
 
 	/**
 	 * Constructor
-	 * @param Plugin $plugin
+	 * @param string $templatePath
 	 */
-	function LegacyJR1($plugin) {
-		$this->_plugin = $plugin;
+	function LegacyJR1($templatePath) {
+		$this->_templatePath = $templatePath;
 	}
 
 	/**
@@ -96,7 +96,7 @@ class LegacyJR1 {
 		fputcsv($fp, $cols);
 
 		// Get statistics from the log.
-		$journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
+		$journalDao = DAORegistry::getDAO('JournalDAO');
 		$journalIds = $this->_getJournalIds($useLegacyStats);
 		foreach ($journalIds as $journalId) {
 			$journal = $journalDao->getById($journalId);
@@ -104,10 +104,10 @@ class LegacyJR1 {
 			$entries = $this->_getMonthlyLogRange($journalId, $begin, $end, $useLegacyStats);
 			$cols = array(
 				$journal->getLocalizedName(),
-				$journal->getData('publisherInstitution'),
-				__('common.software'), // Platform
-				$journal->getData('printIssn'),
-				$journal->getData('onlineIssn')
+				$journal->getSetting('publisherInstitution'),
+				__('common.openJournalSystems'), // Platform
+				$journal->getSetting('printIssn'),
+				$journal->getSetting('onlineIssn')
 			);
 			$this->_formColumns($cols, $entries);
 			fputcsv($fp, $cols);
@@ -161,7 +161,7 @@ class LegacyJR1 {
 	function _assignTemplateCounterXML($request, $templateManager, $begin, $end='', $useLegacyStats) {
 		$journal = $request->getContext();
 
-		$journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
+		$journalDao = DAORegistry::getDAO('JournalDAO');
 		$journalIds = $this->_getJournalIds($useLegacyStats);
 
 		$site = $request->getSite();
@@ -169,7 +169,7 @@ class LegacyJR1 {
 		if ($availableContexts->getCount() > 1) {
 			$vendorName = $site->getLocalizedTitle();
 		} else {
-			$vendorName =  $journal->getData('publisherInstitution');
+			$vendorName =  $journal->getSetting('publisherInstitution');
 			if (empty($vendorName)) {
 				$vendorName = $journal->getLocalizedName();
 			}
@@ -186,9 +186,9 @@ class LegacyJR1 {
 
 			$journalsArray[$i]['entries'] = $this->_arrangeEntries($entries);
 			$journalsArray[$i]['journalTitle'] = $journal->getLocalizedName();
-			$journalsArray[$i]['publisherInstitution'] = $journal->getData('publisherInstitution');
-			$journalsArray[$i]['printIssn'] = $journal->getData('printIssn');
-			$journalsArray[$i]['onlineIssn'] = $journal->getData('onlineIssn');
+			$journalsArray[$i]['publisherInstitution'] = $journal->getSetting('publisherInstitution');
+			$journalsArray[$i]['printIssn'] = $journal->getSetting('printIssn');
+			$journalsArray[$i]['onlineIssn'] = $journal->getSetting('onlineIssn');
 			$i++;
 		}
 
@@ -283,7 +283,7 @@ class LegacyJR1 {
 			$fieldId = STATISTICS_DIMENSION_ASSOC_ID;
 		} else {
 			$filter = array(STATISTICS_DIMENSION_ASSOC_TYPE => ASSOC_TYPE_SUBMISSION_FILE);
-			$results = $metricsDao->getMetrics(METRIC_TYPE_COUNTER, array(STATISTICS_DIMENSION_CONTEXT_ID), $filter);
+			$results = $metricsDao->getMetrics(OJS_METRIC_TYPE_COUNTER, array(STATISTICS_DIMENSION_CONTEXT_ID), $filter);
 			$fieldId = STATISTICS_DIMENSION_CONTEXT_ID;
 		}
 		$journalIds = array();
@@ -316,7 +316,7 @@ class LegacyJR1 {
 			$metricType = OJS_METRIC_TYPE_LEGACY_COUNTER;
 		} else {
 			$dimension = STATISTICS_DIMENSION_CONTEXT_ID;
-			$metricType = METRIC_TYPE_COUNTER;
+			$metricType = OJS_METRIC_TYPE_COUNTER;
 			$filter[STATISTICS_DIMENSION_ASSOC_TYPE] = ASSOC_TYPE_SUBMISSION_FILE;
 		}
 
@@ -352,11 +352,9 @@ class LegacyJR1 {
 		list($begin, $end) = $this->_getLimitDates($year);
 
 		$this->_assignTemplateCounterXML($request, $templateManager, $begin, $end, $useLegacyStats);
-		$reportContents = $templateManager->fetch($this->_plugin->getTemplateResource('reportxml.tpl'));
-		header('Content-type: text/xml');
-		echo $reportContents;
+		$templateManager->display($this->_templatePath . 'reportxml.tpl', 'text/xml');
 	}
 
 }
 
-
+?>

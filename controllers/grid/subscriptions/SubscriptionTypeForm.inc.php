@@ -3,9 +3,9 @@
 /**
  * @file classes/subscription/form/SubscriptionTypeForm.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class SubscriptionTypeForm
  * @ingroup manager_form
@@ -43,12 +43,12 @@ class SubscriptionTypeForm extends Form {
 			SUBSCRIPTION_TYPE_FORMAT_PRINT_ONLINE => __('subscriptionTypes.format.printOnline')
 		);
 
-		$isoCodes = new \Sokil\IsoCodes\IsoCodesFactory();
+		$currencyDao = DAORegistry::getDAO('CurrencyDAO');
+		$currencies = $currencyDao->getCurrencies();
 		$this->validCurrencies = array();
-		foreach ($isoCodes->getCurrencies() as $currency) {
-			$this->validCurrencies[$currency->getLetterCode()] = $currency->getLocalName() . ' (' . $currency->getLetterCode() . ')';
+		while (list(, $currency) = each($currencies)) {
+			$this->validCurrencies[$currency->getCodeAlpha()] = $currency->getName() . ' (' . $currency->getCodeAlpha() . ')';
 		}
-		asort($this->validCurrencies);
 
 		$this->typeId = isset($typeId) ? (int) $typeId : null;
 
@@ -83,21 +83,22 @@ class SubscriptionTypeForm extends Form {
 	 * @return array
 	 */
 	function getLocaleFieldNames() {
-		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO'); /* @var $subscriptionTypeDao SubscriptionTypeDAO */
+		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO');
 		return $subscriptionTypeDao->getLocaleFieldNames();
 	}
 
 	/**
-	 * @copydoc Form::fetch()
+	 * Fetch the form.
+	 * @param $request PKPRequest
 	 */
-	function fetch($request, $template = null, $display = false) {
+	function fetch($request) {
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign(array(
 			'typeId' =>$this->typeId,
 			'validCurrencies' => $this->validCurrencies,
 			'validFormats' => $this->validFormats,
 		));
-		return parent::fetch($request, $template, $display);
+		return parent::fetch($request);
 	}
 
 	/**
@@ -105,7 +106,7 @@ class SubscriptionTypeForm extends Form {
 	 */
 	function initData() {
 		if (isset($this->typeId)) {
-			$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO'); /* @var $subscriptionTypeDao SubscriptionTypeDAO */
+			$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO');
 			$subscriptionType = $subscriptionTypeDao->getById($this->typeId, $this->journalId);
 
 			if ($subscriptionType != null) {
@@ -139,10 +140,10 @@ class SubscriptionTypeForm extends Form {
 	}
 
 	/**
-	 * @copydoc Form::execute()
+	 * Save subscription type.
 	 */
-	function execute(...$functionArgs) {
-		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO'); /* @var $subscriptionTypeDao SubscriptionTypeDAO */
+	function execute() {
+		$subscriptionTypeDao = DAORegistry::getDAO('SubscriptionTypeDAO');
 
 		if (isset($this->typeId)) {
 			$subscriptionType = $subscriptionTypeDao->getById($this->typeId, $this->journalId);
@@ -153,8 +154,7 @@ class SubscriptionTypeForm extends Form {
 			$subscriptionType->setInstitutional($this->getData('institutional') == null ? 0 : $this->getData('institutional'));
 		}
 
-		$request = Application::get()->getRequest();
-		$journal = $request->getJournal();
+		$journal = Request::getJournal();
 		$subscriptionType->setJournalId($journal->getId());
 		$subscriptionType->setName($this->getData('name'), null); // Localized
 		$subscriptionType->setDescription($this->getData('description'), null); // Localized
@@ -164,8 +164,6 @@ class SubscriptionTypeForm extends Form {
 		$subscriptionType->setFormat($this->getData('format'));
 		$subscriptionType->setMembership((int) $this->getData('membership'));
 		$subscriptionType->setDisablePublicDisplay((int) $this->getData('disable_public_display'));
-
-		parent::execute(...$functionArgs);
 
 		// Update or insert subscription type
 		if ($subscriptionType->getId() != null) {
@@ -180,4 +178,4 @@ class SubscriptionTypeForm extends Form {
 	}
 }
 
-
+?>

@@ -3,9 +3,9 @@
 /**
  * @file plugins/generic/webFeed/WebFeedGatewayPlugin.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class WebFeedGatewayPlugin
  * @ingroup plugins_generic_webFeed
@@ -67,6 +67,13 @@ class WebFeedGatewayPlugin extends GatewayPlugin {
 	}
 
 	/**
+	 * @copydoc PKPPlugin::getTemplatePath
+	 */
+	public function getTemplatePath($inCore = false) {
+		return $this->_parentPlugin->getTemplatePath($inCore);
+	}
+
+	/**
 	 * Get whether or not this plugin is enabled. (Should always return true, as the
 	 * parent plugin will take care of loading this one when needed)
 	 * @param $contextId int Context ID (optional)
@@ -83,12 +90,12 @@ class WebFeedGatewayPlugin extends GatewayPlugin {
 	 */
 	public function fetch($args, $request) {
 		// Make sure we're within a Journal context
-		$request = Application::get()->getRequest();
+		$request = $this->getRequest();
 		$journal = $request->getJournal();
 		if (!$journal) return false;
 
 		// Make sure there's a current issue for this journal
-		$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
+		$issueDao = DAORegistry::getDAO('IssueDAO');
 		$issue = $issueDao->getCurrent($journal->getId(), true);
 		if (!$issue) return false;
 
@@ -112,31 +119,32 @@ class WebFeedGatewayPlugin extends GatewayPlugin {
 		$displayItems = $this->_parentPlugin->getSetting($journal->getId(), 'displayItems');
 		$recentItems = (int) $this->_parentPlugin->getSetting($journal->getId(), 'recentItems');
 
+		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
 		if ($displayItems == 'recent' && $recentItems > 0) {
-			$submissionsIterator = Services::get('submission')->getMany(['contextId' => $journal->getId(), 'count' => $recentItems]);
-			$submissionsInSections = [];
-			foreach ($submissionsIterator as $submission) {
-				$submissionsInSections[]['articles'][] = $submission;
+			import('lib.pkp.classes.db.DBResultRange');
+			$rangeInfo = new DBResultRange($recentItems, 1);
+			$publishedArticleObjects = $publishedArticleDao->getPublishedArticlesByJournalId($journal->getId(), $rangeInfo, true);
+			$publishedArticles = array();
+			while ($publishedArticle = $publishedArticleObjects->next()) {
+				$publishedArticles[]['articles'][] = $publishedArticle;
 			}
 		} else {
-			$submissionsInSections = Services::get('submission')->getInSections($issue->getId(), $journal->getId());
+			$publishedArticles = $publishedArticleDao->getPublishedArticlesInSections($issue->getId(), true);
 		}
 
-		$versionDao = DAORegistry::getDAO('VersionDAO'); /* @var $versionDao VersionDAO */
+		$versionDao = DAORegistry::getDAO('VersionDAO');
 		$version = $versionDao->getCurrentVersion();
 
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign(array(
 			'ojsVersion' => $version->getVersionString(),
-			'publishedSubmissions' => $submissionsInSections,
+			'publishedArticles' => $publishedArticles,
 			'journal' => $journal,
 			'issue' => $issue,
 			'showToc' => true,
 		));
 
-		AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION); // submission.copyrightStatement
-
-		$templateMgr->display($this->_parentPlugin->getTemplateResource($typeMap[$type]), $mimeTypeMap[$type]);
+		$templateMgr->display($this->getTemplatePath() . $typeMap[$type], $mimeTypeMap[$type]);
 
 		return true;
 	}

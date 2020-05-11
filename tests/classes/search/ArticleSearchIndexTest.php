@@ -3,9 +3,9 @@
 /**
  * @file tests/classes/search/ArticleSearchIndexTest.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2000-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class ArticleSearchIndexTest
  * @ingroup tests_classes_search
@@ -16,9 +16,9 @@
 
 
 import('lib.pkp.tests.PKPTestCase');
-import('classes.submission.Submission');
+import('classes.article.Article');
 import('lib.pkp.classes.core.ArrayItemIterator');
-import('lib.pkp.classes.services.PKPSchemaService'); // SCHEMA_GALLEY constant
+import('classes.search.ArticleSearchIndex');
 
 class ArticleSearchIndexTest extends PKPTestCase {
 
@@ -40,7 +40,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 	/**
 	 * @see PKPTestCase::setUp()
 	 */
-	protected function setUp() : void {
+	protected function setUp() {
 		parent::setUp();
 		HookRegistry::rememberCalledHooks();
 	}
@@ -48,7 +48,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 	/**
 	 * @see PKPTestCase::tearDown()
 	 */
-	protected function tearDown() : void {
+	protected function tearDown() {
 		HookRegistry::resetCalledHooks();
 		parent::tearDown();
 	}
@@ -65,7 +65,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		HookRegistry::register('ArticleSearchIndex::submissionFileChanged', array($this, 'callbackUpdateFileIndex'));
 
 		// Simulate updating an article file via hook.
-		$articleSearchIndex = Application::getSubmissionSearchIndex();
+		$articleSearchIndex = new ArticleSearchIndex();
 		$articleSearchIndex->submissionFileChanged(0, 1, 2);
 
 		// Test whether the hook was called.
@@ -88,7 +88,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		HookRegistry::clear('ArticleSearchIndex::submissionFileDeleted');
 
 		// Test deleting an article from the index with a mock database back-end.#
-		$articleSearchIndex = Application::getSubmissionSearchIndex();
+		$articleSearchIndex = new ArticleSearchIndex();
 		$articleSearchIndex->submissionFileDeleted(0);
 	}
 
@@ -103,7 +103,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		$this->registerMockArticleSearchDAO($this->never(), $this->never());
 
 		// Simulate deleting article index via hook.
-		$articleSearchIndex = Application::getSubmissionSearchIndex();
+		$articleSearchIndex = new ArticleSearchIndex();
 		$articleSearchIndex->submissionFileDeleted(0, 1, 2);
 
 		// Test whether the hook was called.
@@ -130,7 +130,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		$this->expectOutputString("##search.cli.rebuildIndex.clearingIndex## ... ##search.cli.rebuildIndex.done##\n");
 
 		// Test rebuilding the index with a mock database back-end.
-		$articleSearchIndex = Application::getSubmissionSearchIndex();
+		$articleSearchIndex = new ArticleSearchIndex();
 		$articleSearchIndex->rebuildIndex(true);
 	}
 
@@ -145,7 +145,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		$this->expectOutputString("Some log message from the plug-in.");
 
 		// Simulate rebuilding the index via hook.
-		$articleSearchIndex = Application::getSubmissionSearchIndex();
+		$articleSearchIndex = new ArticleSearchIndex();
 		$articleSearchIndex->rebuildIndex(true); // With log
 		$articleSearchIndex->rebuildIndex(false); // Without log (that's why we expect the log message to appear only once).
 
@@ -164,16 +164,14 @@ class ArticleSearchIndexTest extends PKPTestCase {
 
 		// Mock an article so that the authors are not
 		// being retrieved from the database.
-		$article = $this->getMockBuilder(Article::class)
-			->setMethods(array('getAuthors'))
-			->getMock();
+		$article = $this->getMock('Article', array('getAuthors'));
 		$article->expects($this->any())
 		        ->method('getAuthors')
 		        ->will($this->returnValue(array()));
 
 		// Test indexing an article with a mock environment.
 		$articleSearchIndex = $this->getMockArticleSearchIndex($this->atLeastOnce());
-		$articleSearchIndex->submissionMetadataChanged($article);
+		$articleSearchIndex->articleMetadataChanged($article);
 	}
 
 	/**
@@ -184,9 +182,9 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		HookRegistry::register('ArticleSearchIndex::articleMetadataChanged', array($this, 'callbackIndexArticleMetadata'));
 
 		// Simulate indexing via hook.
-		$article = new Submission();
+		$article = new Article();
 		$articleSearchIndex = $this->getMockArticleSearchIndex($this->never());
-		$articleSearchIndex->submissionMetadataChanged($article);
+		$articleSearchIndex->articleMetadataChanged($article);
 
 		// Test whether the hook was called.
 		$calledHooks = HookRegistry::getCalledHooks();
@@ -207,8 +205,8 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		$this->registerFileDAOs(true);
 
 		// Test indexing an article with a mock environment.
-		$article = new Submission();
-		$articleSearchIndex = Application::getSubmissionSearchIndex();
+		$article = new Article();
+		$articleSearchIndex = new ArticleSearchIndex();
 		$articleSearchIndex->submissionFilesChanged($article);
 	}
 
@@ -223,8 +221,8 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		$this->registerFileDAOs(false);
 
 		// Simulate indexing via hook.
-		$article = new Submission();
-		$articleSearchIndex = Application::getSubmissionSearchIndex();
+		$article = new Article();
+		$articleSearchIndex = new ArticleSearchIndex();
 		$articleSearchIndex->submissionFilesChanged($article);
 
 		// Test whether the hook was called.
@@ -253,7 +251,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		self::assertEquals(1, $type);
 		self::assertEquals(2, $fileId);
 
-		// Returning "true" is required so that the default submissionMetadataChanged()
+		// Returning "true" is required so that the default articleMetadataChanged()
 		// code won't run.
 		return true;
 	}
@@ -271,7 +269,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		self::assertEquals(1, $type);
 		self::assertEquals(2, $assocId);
 
-		// Returning "true" is required so that the default submissionMetadataChanged()
+		// Returning "true" is required so that the default articleMetadataChanged()
 		// code won't run.
 		return true;
 	}
@@ -294,15 +292,15 @@ class ArticleSearchIndexTest extends PKPTestCase {
 	/**
 	 * Simulate a search plug-ins "index article metadata"
 	 * hook.
-	 * @see ArticleSearchIndex::submissionMetadataChanged()
+	 * @see ArticleSearchIndex::articleMetadataChanged()
 	 */
 	public function callbackIndexArticleMetadata($hook, $params) {
 		self::assertEquals('ArticleSearchIndex::articleMetadataChanged', $hook);
 
 		list($article) = $params;
-		self::assertInstanceOf('Submission', $article);
+		self::assertInstanceOf('Article', $article);
 
-		// Returning "true" is required so that the default submissionMetadataChanged()
+		// Returning "true" is required so that the default articleMetadataChanged()
 		// code won't run.
 		return true;
 	}
@@ -316,9 +314,9 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		self::assertEquals('ArticleSearchIndex::submissionFilesChanged', $hook);
 
 		list($article) = $params;
-		self::assertInstanceOf('Submission', $article);
+		self::assertInstanceOf('Article', $article);
 
-		// Returning "true" is required so that the default submissionMetadataChanged()
+		// Returning "true" is required so that the default articleMetadataChanged()
 		// code won't run.
 		return true;
 	}
@@ -333,9 +331,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 	 */
 	private function registerMockArticleSearchDAO($clearIndexExpected, $deleteArticleExpected) {
 		// Mock an ArticleSearchDAO.
-		$articleSearchDao = $this->getMockBuilder(ArticleSearchDAO::class)
-			->setMethods(array('clearIndex', 'deleteSubmissionKeywords'))
-			->getMock();
+		$articleSearchDao = $this->getMock('ArticleSearchDAO', array('clearIndex', 'deleteSubmissionKeywords'), array(), '', false);
 
 		// Test the clearIndex() method.
 		$articleSearchDao->expects($clearIndexExpected)
@@ -357,9 +353,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 	 */
 	private function registerMockJournalDAO() {
 		// Mock a JournalDAO.
-		$journalDao = $this->getMockBuilder(JournalDAO::class)
-			->setMethods(array('getAll'))
-			->getMock();
+		$journalDao = $this->getMock('JournalDAO', array('getAll'), array(), '', false);
 
 		// Mock an empty result set.
 		$journals = array();
@@ -380,9 +374,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 	 */
 	private function registerFileDAOs($expectMethodCall) {
 		// Mock file DAOs.
-		$articleGalleyDao = $this->getMockBuilder(ArticleGalleyDAO::class)
-			->setMethods(array('getBySubmissionId'))
-			->getMock();
+		$articleGalleyDao = $this->getMock('ArticleGalleyDAO', array('getBySubmissionId'), array(), '', false);
 
 		// Make sure that the DAOs are being called.
 		if ($expectMethodCall) {
@@ -404,9 +396,7 @@ class ArticleSearchIndexTest extends PKPTestCase {
 	private function getMockArticleSearchIndex($expectedCall) {
 		// Mock ArticleSearchIndex.
 		/* @var $articleSearchIndex ArticleSearchIndex */
-		$articleSearchIndex = $this->getMockBuilder(ArticleSearchIndex::class)
-			->setMethods(array('_updateTextIndex'))
-			->getMock();
+		$articleSearchIndex = $this->getMock('ArticleSearchIndex', array('_updateTextIndex'));
 
 		// Check for _updateTextIndex() calls.
 		$articleSearchIndex->expects($expectedCall)
@@ -415,4 +405,4 @@ class ArticleSearchIndexTest extends PKPTestCase {
 		return $articleSearchIndex;
 	}
 }
-
+?>

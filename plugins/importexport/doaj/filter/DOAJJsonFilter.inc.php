@@ -3,9 +3,9 @@
 /**
  * @file plugins/importexport/doaj/filter/DOAJJsonFilter.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2000-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class DOAJJsonFilter
  * @ingroup plugins_importexport_doaj
@@ -41,7 +41,7 @@ class DOAJJsonFilter extends NativeImportExportFilter {
 	//
 	/**
 	 * @see Filter::process()
-	 * @param $pubObject Submission
+	 * @param $pubObject PublishedArticle
 	 * @return JSON string
 	 */
 	function &process(&$pubObject) {
@@ -64,7 +64,7 @@ class DOAJJsonFilter extends NativeImportExportFilter {
 		$article = array();
 		$article['bibjson']['journal'] = array();
 		// Publisher name (i.e. institution name)
-		$publisher = $context->getData('publisherInstitution');
+		$publisher = $context->getSetting('publisherInstitution');
 		if (!empty($publisher)) $article['bibjson']['journal']['publisher'] = $publisher;
 		// To-Do: license ???
 		// Journal's title (M)
@@ -72,9 +72,9 @@ class DOAJJsonFilter extends NativeImportExportFilter {
 		$article['bibjson']['journal']['title'] = $journalTitle;
 		// Identification Numbers
 		$issns = array();
-		$pissn = $context->getData('printIssn');
+		$pissn = $context->getSetting('printIssn');
 		if (!empty($pissn)) $issns[] = $pissn;
-		$eissn = $context->getData('onlineIssn');
+		$eissn = $context->getSetting('onlineIssn');
 		if (!empty($eissn)) $issns[] = $eissn;
 		if (!empty($issns)) $article['bibjson']['journal']['issns'] = $issns;
 		// Volume, Number
@@ -113,18 +113,19 @@ class DOAJJsonFilter extends NativeImportExportFilter {
 			$article['bibjson']['end_page'] = $endPage;
 		}
 		// FullText URL
-		$request = Application::get()->getRequest();
 		$article['bibjson']['link'] = array();
 		$article['bibjson']['link'][] = array(
-			'url' => $request->url($context->getPath(), 'article', 'view', $pubObject->getId()),
+			'url' => Request::url($context->getPath(), 'article', 'view', $pubObject->getId()),
 			'type' => 'fulltext',
 			'content_type' => 'html'
 		);
-		// Authors: name and affiliation
+		// Authors: name, email and affiliation
 		$article['bibjson']['author'] = array();
 		$articleAuthors = $pubObject->getAuthors();
 		foreach ($articleAuthors as $articleAuthor) {
-			$author = array('name' => $articleAuthor->getFullName(false));
+			$author = array('name' => $articleAuthor->getFullName());
+			$email = $articleAuthor->getEmail();
+			if (!empty($email)) $author['email'] = $email;
 			$affiliation = $articleAuthor->getAffiliation($pubObject->getLocale());
 			if (!empty($affiliation)) $author['affiliation'] = $affiliation;
 			$article['bibjson']['author'][] = $author;
@@ -134,7 +135,7 @@ class DOAJJsonFilter extends NativeImportExportFilter {
 		if (!empty($abstract)) $article['bibjson']['abstract'] = PKPString::html2text($abstract);
 		// Keywords
 		$dao = DAORegistry::getDAO('SubmissionKeywordDAO');
-		$keywords = $dao->getKeywords($pubObject->getCurrentPublication()->getId(), array($pubObject->getLocale()));
+		$keywords = $dao->getKeywords($pubObject->getId(), array($pubObject->getLocale()));
 		$allowedNoOfKeywords = array_slice($keywords[$pubObject->getLocale()], 0, 6);
 		if (!empty($keywords[$pubObject->getLocale()])) $article['bibjson']['keywords'] = $allowedNoOfKeywords;
 
@@ -163,4 +164,4 @@ class DOAJJsonFilter extends NativeImportExportFilter {
 
 }
 
-
+?>

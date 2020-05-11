@@ -3,9 +3,9 @@
 /**
  * @file plugins/generic/announcementFeed/AnnouncementFeedSettingsForm.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class AnnouncementFeedSettingsForm
  * @ingroup plugins_generic_annoucementFeed
@@ -32,7 +32,7 @@ class AnnouncementFeedSettingsForm extends Form {
 		$this->_journalId = $journalId;
 		$this->_plugin = $plugin;
 
-		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
+		parent::__construct($plugin->getTemplatePath() . 'settingsForm.tpl');
 		$this->addCheck(new FormValidatorPost($this));
 		$this->addCheck(new FormValidatorCSRF($this));
 	}
@@ -69,16 +69,14 @@ class AnnouncementFeedSettingsForm extends Form {
 	}
 
 	/**
-	 * @copydoc Form::execute()
+	 * Save settings.
 	 */
-	public function execute(...$functionArgs) {
+	public function execute() {
 		$plugin = $this->_plugin;
 		$journalId = $this->_journalId;
 
 		$plugin->updateSetting($journalId, 'displayPage', $this->getData('displayPage'));
 		$plugin->updateSetting($journalId, 'recentItems', $this->getData('recentItems'));
-
-		parent::execute(...$functionArgs);
 	}
 
 }

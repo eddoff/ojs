@@ -1,9 +1,9 @@
 {**
  * templates/frontend/pages/indexJournal.tpl
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @brief Display the index page for a journal
  *
@@ -22,31 +22,21 @@
 
 	{call_hook name="Templates::Index::journal"}
 
-	{if !$activeTheme->getOption('useHomepageImageAsHeader') && $homepageImage}
+	{if $homepageImage}
 		<div class="homepage_image">
-			<img src="{$publicFilesDir}/{$homepageImage.uploadName|escape:"url"}"{if $homepageImage.altText} alt="{$homepageImage.altText|escape}"{/if}>
+			<img src="{$publicFilesDir}/{$homepageImage.uploadName|escape:"url"}" alt="{$homepageImageAltText|escape}">
 		</div>
-	{/if}
-
-	{* Journal Description *}
-	{if $activeTheme->getOption('showDescriptionInJournalIndex')}
-		<section class="homepage_about">
-			<a id="homepageAbout"></a>
-			<h2>{translate key="about.aboutContext"}</h2>
-			{$currentContext->getLocalizedData('description')}
-		</section>
 	{/if}
 
 	{* Announcements *}
 	{if $numAnnouncementsHomepage && $announcements|@count}
-		<section class="cmp_announcements highlight_first">
-			<a id="homepageAnnouncements"></a>
+		<div class="cmp_announcements highlight_first">
 			<h2>
 				{translate key="announcement.announcements"}
 			</h2>
 			{foreach name=announcements from=$announcements item=announcement}
 				{if $smarty.foreach.announcements.iteration > $numAnnouncementsHomepage}
-					{break}
+					{php}break;{/php}
 				{/if}
 				{if $smarty.foreach.announcements.iteration == 1}
 					{include file="frontend/objects/announcement_summary.tpl" heading="h3"}
@@ -65,13 +55,12 @@
 				{/if}
 			{/foreach}
 			</div><!-- .more -->
-		</section>
+		</div>
 	{/if}
 
 	{* Latest issue *}
 	{if $issue}
-		<section class="current_issue">
-			<a id="homepageIssue"></a>
+		<div class="current_issue">
 			<h2>
 				{translate key="journal.currentIssue"}
 			</h2>
@@ -82,7 +71,7 @@
 			<a href="{url router=$smarty.const.ROUTE_PAGE page="issue" op="archive"}" class="read_more">
 				{translate key="journal.viewAllIssues"}
 			</a>
-		</section>
+		</div>
 	{/if}
 
 	{* Additional Homepage Content *}

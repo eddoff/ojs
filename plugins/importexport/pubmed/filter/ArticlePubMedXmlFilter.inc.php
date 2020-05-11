@@ -3,9 +3,9 @@
 /**
  * @file plugins/importexport/pubmed/filter/ArticlePubMedXmlFilter.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2000-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class ArticlePubMedXmlFilter
  * @ingroup plugins_importexport_pubmed
@@ -63,57 +63,56 @@ class ArticlePubMedXmlFilter extends PersistableFilter {
 		$doc->preserveWhiteSpace = false;
 		$doc->formatOutput = true;
 
-		$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-		$journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
+		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
+		$issueDao = DAORegistry::getDAO('IssueDAO');
+		$journalDao = DAORegistry::getDAO('JournalDAO');
 		$journal = null;
 
 		$rootNode = $doc->createElement('ArticleSet');
 		foreach ($submissions as $submission) {
 			// Fetch associated objects
+			$publishedArticle = $publishedArticleDao->getByArticleId($submission->getId());
 			if (!$journal || $journal->getId() != $submission->getContextId()) {
 				$journal = $journalDao->getById($submission->getContextId());
 			}
-			$issue = $issueDao->getBySubmissionId($submission->getId(), $journal->getId());
+			$issue = $issueDao->getByArticleId($submission->getId(), $journal->getId());
 
 			$articleNode = $doc->createElement('Article');
-			$articleNode->appendChild($this->createJournalNode($doc, $journal, $issue, $submission));
+			$articleNode->appendChild($this->createJournalNode($doc, $journal, $issue, $submission, $publishedArticle));
 
-			$publication = $submission->getCurrentPublication();
 
-			$locale = $publication->getData('locale');
-			if ($locale == 'en_US') {
-				$articleNode->appendChild($doc->createElement('ArticleTitle'))->appendChild($doc->createTextNode($publication->getLocalizedTitle($locale)));
+			$submissionLocale = $submission->getLocale();
+			if ($submissionLocale == 'en_US') {
+				$articleNode->appendChild($doc->createElement('ArticleTitle', $submission->getTitle($submissionLocale)));
 			} else {
-				$articleNode->appendChild($doc->createElement('VernacularTitle'))->appendChild($doc->createTextNode($publication->getLocalizedTitle($locale)));
+				$articleNode->appendChild($doc->createElement('VernacularTitle', $submission->getTitle($submissionLocale)));
 			}
 
-			$startPage = $publication->getStartingPage();
-			$endPage = $publication->getEndingPage();
+			$startPage = $submission->getStartingPage();
+			$endPage = $submission->getEndingPage();
 			if (isset($startPage) && $startPage !== '') {
 				// We have a page range or e-location id
-				$articleNode->appendChild($doc->createElement('FirstPage'))->appendChild($doc->createTextNode($startPage));
-				$articleNode->appendChild($doc->createElement('LastPage'))->appendChild($doc->createTextNode($endPage));
+				$articleNode->appendChild($doc->createElement('FirstPage', $startPage));
+				$articleNode->appendChild($doc->createElement('LastPage', $endPage));
 			}
 
-			if ($doi = $publication->getStoredPubId('doi')) {
-				$doiNode = $doc->createElement('ELocationID');
-				$doiNode->appendChild($doc->createTextNode($doi));
+			if ($doi = $submission->getStoredPubId('doi')) {
+				$doiNode = $doc->createElement('ELocationID', $doi);
 				$doiNode->setAttribute('EIdType', 'doi');
 				$articleNode->appendChild($doiNode);
 			}
 
-			$articleNode->appendChild($doc->createElement('Language'))->appendChild($doc->createTextNode(AppLocale::get3LetterFrom2LetterIsoLanguage(substr($locale, 0, 2))));
+			$articleNode->appendChild($doc->createElement('Language', AppLocale::get3LetterFrom2LetterIsoLanguage(substr($submission->getLocale(), 0, 2))));
 
 			$authorListNode = $doc->createElement('AuthorList');
-			foreach ((array) $publication->getData('authors') as $author) {
-				$authorListNode->appendChild($this->generateAuthorNode($doc, $journal, $issue, $submission, $author));
+			foreach ($submission->getAuthors() as $authorIndex => $author) {
+				$authorListNode->appendChild($this->generateAuthorNode($doc, $journal, $issue, $submission, $author, $authorIndex));
 			}
 			$articleNode->appendChild($authorListNode);
 
-			if ($publication->getStoredPubId('publisher-id')) {
+			if ($submission->getStoredPubId('publisher-id')) {
 				$articleIdListNode = $doc->createElement('ArticleIdList');
-				$articleIdNode = $doc->createElement('ArticleId');
-				$articleIdNode->appendChild($doc->createTextNode($publication->getStoredPubId('publisher-id')));
+				$articleIdNode = $doc->createElement('ArticleId', $publisherId);
 				$articleIdNode->setAttribute('IdType', 'pii');
 				$articleIdListNode->appendChild($articleIdNode);
 				$articleNode->appendChild($articleIdListNode);
@@ -123,7 +122,7 @@ class ArticlePubMedXmlFilter extends PersistableFilter {
 			$historyNode = $doc->createElement('History');
 			$historyNode->appendChild($this->generatePubDateDom($doc, $submission->getDateSubmitted(), 'received'));
 
-			$editDecisionDao = DAORegistry::getDAO('EditDecisionDAO'); /* @var $editDecisionDao EditDecisionDAO */
+			$editDecisionDao = DAORegistry::getDAO('EditDecisionDAO');
 			$editDecisions = (array) $editDecisionDao->getEditorDecisions($submission->getId());
 			do {
 				$editorDecision = array_pop($editDecisions);
@@ -136,8 +135,8 @@ class ArticlePubMedXmlFilter extends PersistableFilter {
 
 			// FIXME: Revision dates
 
-			if ($abstract = PKPString::html2text($publication->getLocalizedData('abstract', $locale))) {
-				$articleNode->appendChild($doc->createElement('Abstract'))->appendChild($doc->createTextNode($abstract));
+			if ($abstract = PKPString::html2text($submission->getAbstract($submissionLocale))) {
+				$articleNode->appendChild($doc->createElement('Abstract', $abstract));
 			}
 
 			$rootNode->appendChild($articleNode);
@@ -152,30 +151,29 @@ class ArticlePubMedXmlFilter extends PersistableFilter {
 	 * @param $journal Journal
 	 * @param $issue Issue
 	 * @param $submission Submission
+	 * @param $publishedArticle PublishedArticle
 	 */
-	function createJournalNode($doc, $journal, $issue, $submission) {
+	function createJournalNode($doc, $journal, $issue, $submission, $publishedArticle) {
 		$journalNode = $doc->createElement('Journal');
 
-		$publisherNameNode = $doc->createElement('PublisherName');
-		$publisherNameNode->appendChild($doc->createTextNode($journal->getData('publisherInstitution')));
+		$publisherNameNode = $doc->createElement('PublisherName', $journal->getSetting('publisherInstitution'));
 		$journalNode->appendChild($publisherNameNode);
 
-		$journalTitleNode = $doc->createElement('JournalTitle');
-		$journalTitleNode->appendChild($doc->createTextNode($journal->getName($journal->getPrimaryLocale())));
+		$journalTitleNode = $doc->createElement('JournalTitle', $journal->getName($journal->getPrimaryLocale()));
 		$journalNode->appendChild($journalTitleNode);
 
 		// check various ISSN fields to create the ISSN tag
-		if ($journal->getData('printIssn') != '') $issn = $journal->getData('printIssn');
-		elseif ($journal->getData('issn') != '') $issn = $journal->getData('issn');
-		elseif ($journal->getData('onlineIssn') != '') $issn = $journal->getData('onlineIssn');
+		if ($journal->getSetting('printIssn') != '') $issn = $journal->getSetting('printIssn');
+		elseif ($journal->getSetting('issn') != '') $issn = $journal->getSetting('issn');
+		elseif ($journal->getSetting('onlineIssn') != '') $issn = $journal->getSetting('onlineIssn');
 		else $issn = '';
 		if ($issn != '') $journalNode->appendChild($doc->createElement('Issn', $issn));
 
-		if ($issue && $issue->getShowVolume()) $journalNode->appendChild($doc->createElement('Volume'))->appendChild($doc->createTextNode($issue->getVolume()));
-		if ($issue && $issue->getShowNumber()) $journalNode->appendChild($doc->createElement('Issue'))->appendChild($doc->createTextNode($issue->getNumber()));
+		if ($issue && $issue->getShowVolume()) $journalNode->appendChild($doc->createElement('Volume', $issue->getVolume()));
+		if ($issue && $issue->getShowNumber()) $journalNode->appendChild($doc->createElement('Issue', $issue->getNumber()));
 
 		$datePublished = null;
-		if ($submission) $datePublished = $submission->getCurrentPublication()->getData('datePublished');
+		if ($publishedArticle) $datePublished = $publishedArticle->getDatePublished();
 		if (!$datePublished && $issue) $datePublished = $issue->getDatePublished();
 		if ($datePublished) {
 			$journalNode->appendChild($this->generatePubDateDom($doc, $datePublished, 'epublish'));
@@ -193,18 +191,17 @@ class ArticlePubMedXmlFilter extends PersistableFilter {
 	 * @param $author Author
 	 * @return DOMElement
 	 */
-	function generateAuthorNode($doc, $journal, $issue, $submission, $author) {
+	function generateAuthorNode($doc, $journal, $issue, $submission, $author, $authorIndex) {
 		$authorElement = $doc->createElement('Author');
 
-		if (empty($author->getLocalizedFamilyName())) {
-			$authorElement->appendChild($node = $doc->createElement('FirstName'));
-			$node->setAttribute('EmptyYN', 'Y');
-			$authorElement->appendChild($doc->createElement('LastName'))->appendChild($doc->createTextNode(ucfirst($author->getLocalizedGivenName())));
-		} else {
-			$authorElement->appendChild($doc->createElement('FirstName'))->appendChild($doc->createTextNode(ucfirst($author->getLocalizedGivenName())));
-			$authorElement->appendChild($doc->createElement('LastName'))->appendChild($doc->createTextNode(ucfirst($author->getLocalizedFamilyName())));
+		$authorElement->appendChild($doc->createElement('FirstName', ucfirst($author->getFirstName())));
+		if ($author->getMiddleName() != '') $authorElement->appendChild($doc->createElement('MiddleName', ucfirst($author->getMiddleName())));
+		$authorElement->appendChild($doc->createElement('LastName', ucfirst($author->getLastName())));
+
+		if ($authorIndex == 0) {
+			// See http://pkp.sfu.ca/bugzilla/show_bug.cgi?id=7774
+			$authorElement->appendChild($doc->createElement('Affiliation', $author->getLocalizedAffiliation() . '. ' . $author->getEmail()));
 		}
-		$authorElement->appendChild($doc->createElement('Affiliation'))->appendChild($doc->createTextNode($author->getLocalizedAffiliation() . '. ' . $author->getEmail()));
 
 		return $authorElement;
 	}
@@ -228,4 +225,4 @@ class ArticlePubMedXmlFilter extends PersistableFilter {
 	}
 }
 
-
+?>

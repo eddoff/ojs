@@ -3,9 +3,9 @@
 /**
  * @file plugins/importexport/native/filter/IssueNativeXmlFilter.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2000-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class IssueNativeXmlFilter
  * @ingroup plugins_importexport_native
@@ -89,7 +89,6 @@ class IssueNativeXmlFilter extends NativeExportFilter {
 		$issueNode->setAttribute('published', $issue->getPublished());
 		$issueNode->setAttribute('current', $issue->getCurrent());
 		$issueNode->setAttribute('access_status', $issue->getAccessStatus());
-		$issueNode->setAttribute('url_path', $issue->getData('urlPath'));
 
 		$this->createLocalizedNodes($doc, $issueNode, 'description', $issue->getDescription(null));
 		import('plugins.importexport.native.filter.NativeFilterHelper');
@@ -98,12 +97,7 @@ class IssueNativeXmlFilter extends NativeExportFilter {
 
 		$this->addDates($doc, $issueNode, $issue);
 		$this->addSections($doc, $issueNode, $issue);
-		// cover images
-		import('plugins.importexport.native.filter.NativeFilterHelper');
-		$nativeFilterHelper = new NativeFilterHelper();
-		$coversNode = $nativeFilterHelper->createIssueCoversNode($this, $doc, $issue);
-		if ($coversNode) $issueNode->appendChild($coversNode);
-
+		$this->addCoverImages($doc, $issueNode, $issue);
 		$this->addIssueGalleys($doc, $issueNode, $issue);
 		$this->addArticles($doc, $issueNode, $issue);
 
@@ -111,7 +105,7 @@ class IssueNativeXmlFilter extends NativeExportFilter {
 	}
 
 	/**
-	 * Create and add identifier nodes to an issue node.
+	 * Create and add identifier nodes to a submission node.
 	 * @param $doc DOMDocument
 	 * @param $issueNode DOMElement
 	 * @param $issue Issue
@@ -133,7 +127,7 @@ class IssueNativeXmlFilter extends NativeExportFilter {
 
 		// Add pub IDs by plugin
 		$pubIdPlugins = PluginRegistry::loadCategory('pubIds', true, $deployment->getContext()->getId());
-		foreach ($pubIdPlugins as $pubIdPlugin) {
+		foreach ((array) $pubIdPlugins as $pubIdPlugin) {
 			$this->addPubIdentifier($doc, $issueNode, $issue, $pubIdPlugin);
 		}
 	}
@@ -187,20 +181,15 @@ class IssueNativeXmlFilter extends NativeExportFilter {
 	 * @param $issue Issue
 	 */
 	function addArticles($doc, $issueNode, $issue) {
-		$filterDao = DAORegistry::getDAO('FilterDAO'); /* @var $filterDao FilterDAO */
+		$filterDao = DAORegistry::getDAO('FilterDAO');
 		$nativeExportFilters = $filterDao->getObjectsByGroup('article=>native-xml');
 		assert(count($nativeExportFilters)==1); // Assert only a single serialization filter
 		$exportFilter = array_shift($nativeExportFilters);
-		$exportFilter->setOpts($this->opts);
 		$exportFilter->setDeployment($this->getDeployment());
 		$exportFilter->setIncludeSubmissionsNode(true);
 
-		$submissionsIterator = Services::get('submission')->getMany([
-			'contextId' => $issue->getJournalId(),
-			'issueIds' => $issue->getId(),
-		]);
-		$submissionsArray = iterator_to_array($submissionsIterator);
-		$articlesDoc = $exportFilter->execute($submissionsArray);
+		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
+		$articlesDoc = $exportFilter->execute($publishedArticleDao->getPublishedArticles($issue->getId()));
 		if ($articlesDoc->documentElement instanceof DOMElement) {
 			$clone = $doc->importNode($articlesDoc->documentElement, true);
 			$issueNode->appendChild($clone);
@@ -214,18 +203,47 @@ class IssueNativeXmlFilter extends NativeExportFilter {
 	 * @param $issue Issue
 	 */
 	function addIssueGalleys($doc, $issueNode, $issue) {
-		$filterDao = DAORegistry::getDAO('FilterDAO'); /* @var $filterDao FilterDAO */
+		$filterDao = DAORegistry::getDAO('FilterDAO');
 		$nativeExportFilters = $filterDao->getObjectsByGroup('issuegalley=>native-xml');
 		assert(count($nativeExportFilters)==1); // Assert only a single serialization filter
 		$exportFilter = array_shift($nativeExportFilters);
 		$exportFilter->setDeployment($this->getDeployment());
 
-		$issueGalleyDao = DAORegistry::getDAO('IssueGalleyDAO'); /* @var $issueGalleyDao IssueGalleyDAO */
-		$issue = $issueGalleyDao->getByIssueId($issue->getId());
-		$issueGalleysDoc = $exportFilter->execute($issue);
+		$issueGalleyDao = DAORegistry::getDAO('IssueGalleyDAO');
+		$issueGalleysDoc = $exportFilter->execute($issueGalleyDao->getByIssueId($issue->getId()));
 		if ($issueGalleysDoc->documentElement instanceof DOMElement) {
 			$clone = $doc->importNode($issueGalleysDoc->documentElement, true);
 			$issueNode->appendChild($clone);
+		}
+	}
+
+	/**
+	 * Add the issue cover images to its DOM element.
+	 * @param $doc DOMDocument
+	 * @param $issueNode DOMElement
+	 * @param $issue Issue
+	 */
+	function addCoverImages($doc, $issueNode, $issue) {
+		$coverImages = $issue->getCoverImage(null);
+		if (!empty($coverImages)) {
+			$deployment = $this->getDeployment();
+			$issueCoversNode = $doc->createElementNS($deployment->getNamespace(), 'issue_covers');
+			foreach ($coverImages as $locale => $coverImage) {
+				$coverNode = $doc->createElementNS($deployment->getNamespace(), 'cover');
+				$coverNode->setAttribute('locale', $locale);
+				$coverNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'cover_image', htmlspecialchars($coverImage, ENT_COMPAT, 'UTF-8')));
+				$coverNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'cover_image_alt_text', htmlspecialchars($issue->getCoverImageAltText($locale), ENT_COMPAT, 'UTF-8')));
+
+				import('classes.file.PublicFileManager');
+				$publicFileManager = new PublicFileManager();
+				$filePath = $publicFileManager->getContextFilesPath(ASSOC_TYPE_JOURNAL, $issue->getJournalId()) . '/' . $coverImage;
+				$embedNode = $doc->createElementNS($deployment->getNamespace(), 'embed', base64_encode(file_get_contents($filePath)));
+				$embedNode->setAttribute('encoding', 'base64');
+				$coverNode->appendChild($embedNode);
+
+				$issueCoversNode->appendChild($coverNode);
+			}
+			$issueNode->appendChild($issueCoversNode);
 		}
 	}
 
@@ -236,13 +254,10 @@ class IssueNativeXmlFilter extends NativeExportFilter {
 	 * @param $issue Issue
 	 */
 	function addSections($doc, $issueNode, $issue) {
-		$sectionDao = DAORegistry::getDAO('SectionDAO'); /* @var $sectionDao SectionDAO */
+		$sectionDao = DAORegistry::getDAO('SectionDAO');
 		$sections = $sectionDao->getByIssueId($issue->getId());
 		$deployment = $this->getDeployment();
 		$journal = $deployment->getContext();
-
-		// Boundary condition: no sections in this issue.
-		if (!count($sections)) return;
 
 		$sectionsNode = $doc->createElementNS($deployment->getNamespace(), 'sections');
 		foreach ($sections as $section) {
@@ -254,7 +269,7 @@ class IssueNativeXmlFilter extends NativeExportFilter {
 
 			if ($section->getReviewFormId()) $sectionNode->setAttribute('review_form_id', $section->getReviewFormId());
 			$sectionNode->setAttribute('ref', $section->getAbbrev($journal->getPrimaryLocale()));
-			$sectionNode->setAttribute('seq', (int) $section->getSequence());
+			$sectionNode->setAttribute('seq', $section->getSequence());
 			$sectionNode->setAttribute('editor_restricted', $section->getEditorRestricted());
 			$sectionNode->setAttribute('meta_indexed', $section->getMetaIndexed());
 			$sectionNode->setAttribute('meta_reviewed', $section->getMetaReviewed());
@@ -274,3 +289,5 @@ class IssueNativeXmlFilter extends NativeExportFilter {
 	}
 
 }
+
+?>

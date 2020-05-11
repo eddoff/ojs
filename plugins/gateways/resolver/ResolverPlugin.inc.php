@@ -3,9 +3,9 @@
 /**
  * @file plugins/gateways/resolver/ResolverPlugin.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class ResolverPlugin
  * @ingroup plugins_gateways_resolver
@@ -63,10 +63,11 @@ class ResolverPlugin extends GatewayPlugin {
 		switch ($scheme) {
 			case 'doi':
 				$doi = implode('/', $args);
-				$submissionDao = DAORegistry::getDAO('SubmissionDAO'); /* @var $submissionDao SubmissionDAO */
-				$article = $submissionDao->getByPubId('doi', $doi, $request->getJournal());
-				if($article) {
-					$request->redirect(null, 'article', 'view', $article->getBestId());
+				$journal = $request->getJournal();
+				$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO'); /* @var $publishedArticleDao PublishedArticleDAO */
+				$article = $publishedArticleDao->getPublishedArticleByPubId('doi', $doi, $journal?$journal->getId():null);
+				if(is_a($article, 'PublishedArticle')) {
+					$request->redirect(null, 'article', 'view', $article->getBestArticleId());
 				}
 				break;
 			case 'vnp': // Volume, number, page
@@ -87,7 +88,7 @@ class ResolverPlugin extends GatewayPlugin {
 				$number = array_shift($args);
 				$page = (int) array_shift($args);
 
-				$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
+				$issueDao = DAORegistry::getDAO('IssueDAO');
 				$issues = $issueDao->getPublishedIssuesByNumber($journal->getId(), $volume, $number, $year);
 
 				// Ensure only one issue matched, and fetch it.
@@ -95,22 +96,21 @@ class ResolverPlugin extends GatewayPlugin {
 				if (!$issue || $issues->next()) break;
 				unset($issues);
 
-				$submissionsIterator = Services::get('submission')->getMany([
-					'issueIds' => $issue->getId(),
-				]);
-				foreach ($submissionsIterator as $submission) {
+				$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
+				$articles = $publishedArticleDao->getPublishedArticles($issue->getId());
+				foreach ($articles as $article) {
 					// Look for the correct page in the list of articles.
 					$matches = null;
-					if (PKPString::regexp_match_get('/^[Pp][Pp]?[.]?[ ]?(\d+)$/', $submission->getPages(), $matches)) {
+					if (PKPString::regexp_match_get('/^[Pp][Pp]?[.]?[ ]?(\d+)$/', $article->getPages(), $matches)) {
 						$matchedPage = $matches[1];
-						if ($page == $matchedPage) $request->redirect(null, 'article', 'view', $submission->getBestId());
+						if ($page == $matchedPage) $request->redirect(null, 'article', 'view', $article->getBestArticleId());
 					}
-					if (PKPString::regexp_match_get('/^[Pp][Pp]?[.]?[ ]?(\d+)[ ]?-[ ]?([Pp][Pp]?[.]?[ ]?)?(\d+)$/', $submission->getPages(), $matches)) {
+					if (PKPString::regexp_match_get('/^[Pp][Pp]?[.]?[ ]?(\d+)[ ]?-[ ]?([Pp][Pp]?[.]?[ ]?)?(\d+)$/', $article->getPages(), $matches)) {
 						$matchedPageFrom = $matches[1];
 						$matchedPageTo = $matches[3];
-						if ($page >= $matchedPageFrom && ($page < $matchedPageTo || ($page == $matchedPageTo && $matchedPageFrom = $matchedPageTo))) $request->redirect(null, 'article', 'view', $submission->getBestId());
+						if ($page >= $matchedPageFrom && ($page < $matchedPageTo || ($page == $matchedPageTo && $matchedPageFrom = $matchedPageTo))) $request->redirect(null, 'article', 'view', $article->getBestArticleId());
 					}
-					unset($submission);
+					unset($article);
 				}
 				break;
 		}
@@ -129,10 +129,10 @@ class ResolverPlugin extends GatewayPlugin {
 	}
 
 	function exportHoldings() {
-		$journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
-		$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
+		$journalDao = DAORegistry::getDAO('JournalDAO');
+		$issueDao = DAORegistry::getDAO('IssueDAO');
 		$journals = $journalDao->getAll(true);
-		$request = Application::get()->getRequest();
+		$request = $this->getRequest();
 		header('content-type: text/plain');
 		header('content-disposition: attachment; filename=holdings.txt');
 		echo "title\tissn\te_issn\tstart_date\tend_date\tembargo_months\tembargo_days\tjournal_url\tvol_start\tvol_end\tiss_start\tiss_end\n";
@@ -155,8 +155,8 @@ class ResolverPlugin extends GatewayPlugin {
 			}
 
 			echo $this->sanitize($journal->getLocalizedName()) . "\t";
-			echo $this->sanitize($journal->getData('printIssn')) . "\t";
-			echo $this->sanitize($journal->getData('onlineIssn')) . "\t";
+			echo $this->sanitize($journal->getSetting('printIssn')) . "\t";
+			echo $this->sanitize($journal->getSetting('onlineIssn')) . "\t";
 			echo $this->sanitize($startDate===null?'':strftime('%Y-%m-%d', $startDate)) . "\t"; // start_date
 			echo $this->sanitize($endDate===null?'':strftime('%Y-%m-%d', $endDate)) . "\t"; // end_date
 			echo $this->sanitize('') . "\t"; // embargo_months
@@ -171,4 +171,4 @@ class ResolverPlugin extends GatewayPlugin {
 	}
 }
 
-
+?>

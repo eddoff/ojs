@@ -3,21 +3,21 @@
 /**
  * @file classes/search/ArticleSearch.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class ArticleSearch
  * @ingroup search
  * @see ArticleSearchDAO
  *
  * @brief Class for retrieving article search results.
- *
  */
 
 import('lib.pkp.classes.search.SubmissionSearch');
 
 class ArticleSearch extends SubmissionSearch {
+
 	/**
 	 * See SubmissionSearch::getSparseArray()
 	 */
@@ -26,36 +26,37 @@ class ArticleSearch extends SubmissionSearch {
 		$resultCount = count($unorderedResults);
 		$i = 0;
 		foreach ($unorderedResults as $submissionId => &$data) {
-			// Reference is necessary to permit modification
 			$data['score'] = ($resultCount * $data['count']) + $i++;
+			unset($data);
 		}
 
 		// If we got a primary sort order then apply it and use score as secondary
 		// order only.
 		// NB: We apply order after merging and before paging/formatting. Applying
-		// order before merging would require us to retrieve dependent objects for
-		// results being purged later. Doing everything in a closed SQL is not
-		// possible (e.g. for authors). Applying sort order after paging and
-		// formatting is not possible as we have to order the whole list before
-		// slicing it. So this seems to be the most appropriate place, although we
-		// may have to retrieve some objects again when formatting results.
+		// order before merging (i.e. in ArticleSearchDAO) would require us to
+		// retrieve dependent objects for results being purged later. Doing
+		// everything in a closed SQL is not possible (e.g. for authors). Applying
+		// sort order after paging and formatting is not possible as we have to
+		// order the whole list before slicing it. So this seems to be the most
+		// appropriate place, although we may have to retrieve some objects again
+		// when formatting results.
 		$orderedResults = array();
 		$authorDao = DAORegistry::getDAO('AuthorDAO'); /* @var $authorDao AuthorDAO */
-		$submissionDao = DAORegistry::getDAO('SubmissionDAO'); /* @var $submissionDao SubmissionDAO */
-		$contextDao = Application::getContextDAO();
-		$contextTitles = array();
+		$articleDao = DAORegistry::getDAO('ArticleDAO'); /* @var $articleDao ArticleDAO */
+		$journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
+		$journalTitles = array();
 		if ($orderBy == 'popularityAll' || $orderBy == 'popularityMonth') {
-			$application = Application::get();
+			$application = PKPApplication::getApplication();
 			$metricType = $application->getDefaultMetricType();
 			if (is_null($metricType)) {
 				// If no default metric has been found then sort by score...
 				$orderBy = 'score';
 			} else {
-				// Retrieve a metrics report for all submissions.
-				$column = STATISTICS_DIMENSION_SUBMISSION_ID;
+				// Retrieve a metrics report for all articles.
+				$column = STATISTICS_DIMENSION_ARTICLE_ID;
 				$filter = array(
-					STATISTICS_DIMENSION_ASSOC_TYPE => array(ASSOC_TYPE_GALLEY, ASSOC_TYPE_SUBMISSION),
-					STATISTICS_DIMENSION_SUBMISSION_ID => array(array_keys($unorderedResults))
+					STATISTICS_DIMENSION_ASSOC_TYPE => array(ASSOC_TYPE_GALLEY, ASSOC_TYPE_ARTICLE),
+					STATISTICS_DIMENSION_ARTICLE_ID => array(array_keys($unorderedResults))
 				);
 				if ($orderBy == 'popularityMonth') {
 					$oneMonthAgo = date('Ymd', strtotime('-1 month'));
@@ -76,24 +77,26 @@ class ArticleSearch extends SubmissionSearch {
 
 			switch ($orderBy) {
 				case 'authors':
-					$submission = $submissionDao->getById($submissionId);
-					$orderKey = $submission->getAuthorString();
+					$authors = $authorDao->getBySubmissionId($submissionId);
+					$authorNames = array();
+					foreach ($authors as $author) { /* @var $author Author */
+						$authorNames[] = $author->getFullName(true);
+					}
+					$orderKey = implode('; ', $authorNames);
+					unset($authors, $authorNames);
 					break;
 
 				case 'title':
-					$submission = $submissionDao->getById($submissionId);
-					$orderKey = '';
-					if (!empty($submission->getCurrentPublication())) {
-						$orderKey = $submission->getCurrentPublication()->getLocalizedData('title');
-					}
+					$submission = $articleDao->getById($submissionId);
+					$orderKey = $submission->getLocalizedTitle(null, false);
 					break;
 
 				case 'journalTitle':
-					if (!isset($contextTitles[$data['journal_id']])) {
-						$context = $contextDao->getById($data['journal_id']);
-						$contextTitles[$data['journal_id']] = $context->getLocalizedName();
+					if (!isset($journalTitles[$data['journal_id']])) {
+						$journal = $journalDao->getById($data['journal_id']);
+						$journalTitles[$data['journal_id']] = $journal->getLocalizedName();
 					}
-					$orderKey = $contextTitles[$data['journal_id']];
+					$orderKey = $journalTitles[$data['journal_id']];
 					break;
 
 				case 'issuePublicationDate':
@@ -177,24 +180,24 @@ class ArticleSearch extends SubmissionSearch {
 		$toDate = $request->getUserDateVar('dateTo', 32, 12, null, 23, 59, 59);
 		$searchFilters['toDate'] = (is_null($toDate) ? null : date('Y-m-d H:i:s', $toDate));
 
-		// Instantiate the context.
-		$context = $request->getContext();
-		$siteSearch = !((boolean)$context);
+		// Instantiate the journal.
+		$journal = $request->getJournal();
+		$siteSearch = !((boolean)$journal);
 		if ($siteSearch) {
-			$contextDao = Application::getContextDAO();
+			$journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
 			if (!empty($searchFilters['searchJournal'])) {
-				$context = $contextDao->getById($searchFilters['searchJournal']);
+				$journal = $journalDao->getById($searchFilters['searchJournal']);
 			} elseif (array_key_exists('journalTitle', $request->getUserVars())) {
-				$contexts = $contextDao->getAll(true);
-				while ($context = $contexts->next()) {
+				$journals = $journalDao->getTitles(false);
+				while ($journal = $journals->next()) {
 					if (in_array(
 						$request->getUserVar('journalTitle'),
-						(array) $context->getTitle(null)
+						(array) $journal->getTitle(null)
 					)) break;
 				}
 			}
 		}
-		$searchFilters['searchJournal'] = $context;
+		$searchFilters['searchJournal'] = $journal;
 		$searchFilters['siteSearch'] = $siteSearch;
 
 		return $searchFilters;
@@ -226,63 +229,64 @@ class ArticleSearch extends SubmissionSearch {
 	 *
 	 * @param $results array
 	 * @param $user User optional (if availability information is desired)
-	 * @return array An array with the articles, published submissions,
+	 * @return array An array with the articles, published articles,
 	 *  issue, journal, section and the issue availability.
 	 */
 	function formatResults($results, $user = null) {
-		$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-		$contextDao = Application::getContextDAO();
-		$sectionDao = DAORegistry::getDAO('SectionDAO'); /* @var $sectionDao SectionDAO */
+		$articleDao = DAORegistry::getDAO('ArticleDAO');
+		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
+		$issueDao = DAORegistry::getDAO('IssueDAO');
+		$journalDao = DAORegistry::getDAO('JournalDAO');
+		$sectionDao = DAORegistry::getDAO('SectionDAO');
 
-		$publishedSubmissionCache = array();
+		$publishedArticleCache = array();
 		$articleCache = array();
 		$issueCache = array();
 		$issueAvailabilityCache = array();
-		$contextCache = array();
+		$journalCache = array();
 		$sectionCache = array();
 
 		$returner = array();
 		foreach ($results as $articleId) {
 			// Get the article, storing in cache if necessary.
 			if (!isset($articleCache[$articleId])) {
-				$submission = Services::get('submission')->get($articleId);
-				$publishedSubmissionCache[$articleId] = $submission;
-				$articleCache[$articleId] = $submission;
+				$publishedArticleCache[$articleId] = $publishedArticleDao->getByArticleId($articleId);
+				$articleCache[$articleId] = $articleDao->getById($articleId);
 			}
 			$article = $articleCache[$articleId];
-			$publishedSubmission = $publishedSubmissionCache[$articleId];
+			$publishedArticle = $publishedArticleCache[$articleId];
 
-			if ($publishedSubmission && $article) {
+			if ($publishedArticle && $article) {
 				$sectionId = $article->getSectionId();
 				if (!isset($sectionCache[$sectionId])) {
 					$sectionCache[$sectionId] = $sectionDao->getById($sectionId);
 				}
 
-				// Get the context, storing in cache if necessary.
-				$contextId = $article->getData('contextId');
-				if (!isset($contextCache[$contextId])) {
-					$contextCache[$contextId] = $contextDao->getById($contextId);
+				// Get the journal, storing in cache if necessary.
+				$journalId = $article->getJournalId();
+				if (!isset($journalCache[$journalId])) {
+					$journalCache[$journalId] = $journalDao->getById($journalId);
 				}
 
 				// Get the issue, storing in cache if necessary.
-				$issueId = $publishedSubmission->getCurrentPublication()->getData('issueId');
+				$issueId = $publishedArticle->getIssueId();
 				if (!isset($issueCache[$issueId])) {
 					$issue = $issueDao->getById($issueId);
 					$issueCache[$issueId] = $issue;
 					import('classes.issue.IssueAction');
 					$issueAction = new IssueAction();
-					$issueAvailabilityCache[$issueId] = !$issueAction->subscriptionRequired($issue, $contextCache[$contextId]) || $issueAction->subscribedUser($user, $contextCache[$contextId], $issueId, $articleId) || $issueAction->subscribedDomain(Application::get()->getRequest(), $contextCache[$contextId], $issueId, $articleId);
+					$issueAvailabilityCache[$issueId] = !$issueAction->subscriptionRequired($issue, $journalCache[$journalId]) || $issueAction->subscribedUser($user, $journalCache[$journalId], $issueId, $articleId) || $issueAction->subscribedDomain(Application::getRequest(), $journalCache[$journalId], $issueId, $articleId);
 				}
 
 				// Only display articles from published issues.
-				if (!isset($issueCache[$issueId]) || !$issueCache[$issueId]->getPublished()) continue;
+				if (!$issueCache[$issueId]->getPublished()) continue;
 
 				// Store the retrieved objects in the result array.
 				$returner[] = array(
 					'article' => $article,
-					'publishedSubmission' => $publishedSubmissionCache[$articleId],
+					'publishedArticle' => $publishedArticleCache[$articleId],
 					'issue' => $issueCache[$issueId],
-					'journal' => $contextCache[$contextId],
+					'journal' => $journalCache[$journalId],
 					'issueAvailable' => $issueAvailabilityCache[$issueId],
 					'section' => $sectionCache[$sectionId]
 				);
@@ -306,14 +310,14 @@ class ArticleSearch extends SubmissionSearch {
 		// of the submission for a similarity search.
 		if ($result === false) {
 			// Retrieve the article.
-			$article = Services::get('submission')->get($submissionId);
-			if ($article->getData('status') === STATUS_PUBLISHED) {
+			$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO'); /* @var $publishedArticleDao PublishedArticleDAO */
+			$article = $publishedArticleDao->getByArticleId($submissionId);
+			if (is_a($article, 'PublishedArticle')) {
 				// Retrieve keywords (if any).
-				$submissionSubjectDao = DAORegistry::getDAO('SubmissionKeywordDAO'); /* @var $submissionSubjectDao SubmissionKeywordDAO */
-				$allSearchTerms = array_filter($submissionSubjectDao->getKeywords($article->getId(), array(AppLocale::getLocale(), $article->getLocale(), AppLocale::getPrimaryLocale())));
-				foreach ($allSearchTerms as $locale => $localeSearchTerms) {
-					$searchTerms += $localeSearchTerms;
-				}
+				$searchTerms = $article->getLocalizedSubject();
+				// Tokenize keywords.
+				$searchTerms = trim(preg_replace('/\s+/', ' ', strtr($searchTerms, ',;', ' ')));
+				if (!empty($searchTerms)) $searchTerms = explode(' ', $searchTerms);
 			}
 		}
 
@@ -346,7 +350,7 @@ class ArticleSearch extends SubmissionSearch {
 		);
 
 		// Only show the "popularity" options if we have a default metric.
-		$application = Application::get();
+		$application = PKPApplication::getApplication();
 		$metricType = $application->getDefaultMetricType();
 		if (!is_null($metricType)) {
 			$resultSetOrderingOptions['popularityAll'] = __('search.results.orderBy.popularityAll');
@@ -354,15 +358,15 @@ class ArticleSearch extends SubmissionSearch {
 		}
 
 		// Only show the "journal title" option if we have several journals.
-		$context = $request->getContext();
-		if (!$context) {
+		$journal = $request->getContext();
+		if (!is_a($journal, 'Journal')) {
 			$resultSetOrderingOptions['journalTitle'] = __('search.results.orderBy.journal');
 		}
 
 		// Let plugins mangle the search ordering options.
 		HookRegistry::call(
 			'SubmissionSearch::getResultSetOrderingOptions',
-			array($context, &$resultSetOrderingOptions)
+			array($journal, &$resultSetOrderingOptions)
 		);
 
 		return $resultSetOrderingOptions;
@@ -387,4 +391,4 @@ class ArticleSearch extends SubmissionSearch {
 	}
 }
 
-
+?>

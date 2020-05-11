@@ -3,9 +3,9 @@
 /**
  * @file controllers/grid/subscriptions/PaymentsGridHandler.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2000-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class PaymentsGridHandler
  * @ingroup controllers_grid_subscriptions
@@ -114,9 +114,11 @@ class PaymentsGridHandler extends GridHandler {
 
 	/**
 	 * @copydoc GridHandler::loadData()
+	 * @param $request PKPRequest
+	 * @return array Grid data.
 	 */
 	protected function loadData($request, $filter) {
-		$paymentDao = DAORegistry::getDAO('OJSCompletedPaymentDAO'); /* @var $paymentDao OJSCompletedPaymentDAO */
+		$paymentDao = DAORegistry::getDAO('OJSCompletedPaymentDAO');
 		$rangeInfo = $this->getGridRangeInfo($request, $this->getId());
 		return $paymentDao->getByContextId($request->getContext()->getId(), $rangeInfo);
 	}

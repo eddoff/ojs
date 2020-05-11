@@ -3,9 +3,9 @@
 /**
  * @file plugins/importexport/pubmed/PubMedExportPlugin.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class PubMedExportPlugin
  * @ingroup plugins_importexport_pubmed
@@ -51,6 +51,13 @@ class PubMedExportPlugin extends ImportExportPlugin {
 	}
 
 	/**
+	 * @copydoc Plugin::getTemplatePath($inCore)
+	 */
+	function getTemplatePath($inCore = false) {
+		return parent::getTemplatePath($inCore) . 'templates/';
+	}
+
+	/**
 	 * Display the plugin.
 	 * @param $args array
 	 * @param $request PKPRequest
@@ -58,32 +65,18 @@ class PubMedExportPlugin extends ImportExportPlugin {
 	function display($args, $request) {
 		parent::display($args, $request);
 		$templateMgr = TemplateManager::getManager($request);
-		$context = $request->getContext();
+		$journal = $request->getJournal();
 		switch (array_shift($args)) {
 			case 'index':
 			case '':
-				$exportSubmissionsListPanel = new \PKP\components\listPanels\PKPSelectSubmissionsListPanel(
-					'exportSubmissionsListPanel',
-					__('plugins.importexport.native.exportSubmissionsSelect'),
-					[
-						'apiUrl' => $request->getDispatcher()->url(
-							$request,
-							ROUTE_API,
-							$context->getPath(),
-							'_submissions'
-						),
-						'canSelect' => true,
-						'canSelectAll' => true,
-						'lazyLoad' => true,
-						'selectorName' => 'selectedSubmissions[]',
-					]
-				);
-				$templateMgr->assign('exportSubmissionsListData', [
-					'components' => [
-						'exportSubmissionsListPanel' => $exportSubmissionsListPanel->getConfig()
-					]
-				]);
-				$templateMgr->display($this->getTemplateResource('index.tpl'));
+				import('lib.pkp.controllers.list.submissions.SelectSubmissionsListHandler');
+				$exportSubmissionsListHandler = new SelectSubmissionsListHandler(array(
+					'title' => 'plugins.importexport.native.exportSubmissionsSelect',
+					'count' => 100,
+					'inputName' => 'selectedSubmissions[]',
+				));
+				$templateMgr->assign('exportSubmissionsListData', json_encode($exportSubmissionsListHandler->getConfig()));
+				$templateMgr->display($this->getTemplatePath() . 'index.tpl');
 				break;
 			case 'exportSubmissions':
 				$exportXml = $this->exportSubmissions(
@@ -93,10 +86,10 @@ class PubMedExportPlugin extends ImportExportPlugin {
 				);
 				import('lib.pkp.classes.file.FileManager');
 				$fileManager = new FileManager();
-				$exportFileName = $this->getExportFileName($this->getExportPath(), 'articles', $context, '.xml');
+				$exportFileName = $this->getExportFileName($this->getExportPath(), 'articles', $journal, '.xml');
 				$fileManager->writeFile($exportFileName, $exportXml);
-				$fileManager->downloadByPath($exportFileName);
-				$fileManager->deleteByPath($exportFileName);
+				$fileManager->downloadFile($exportFileName);
+				$fileManager->deleteFile($exportFileName);
 				break;
 			case 'exportIssues':
 				$exportXml = $this->exportIssues(
@@ -106,10 +99,10 @@ class PubMedExportPlugin extends ImportExportPlugin {
 				);
 				import('lib.pkp.classes.file.FileManager');
 				$fileManager = new FileManager();
-				$exportFileName = $this->getExportFileName($this->getExportPath(), 'issues', $context, '.xml');
+				$exportFileName = $this->getExportFileName($this->getExportPath(), 'issues', $journal, '.xml');
 				$fileManager->writeFile($exportFileName, $exportXml);
-				$fileManager->downloadByPath($exportFileName);
-				$fileManager->deleteByPath($exportFileName);
+				$fileManager->downloadFile($exportFileName);
+				$fileManager->deleteFile($exportFileName);
 				break;
 			default:
 				$dispatcher = $request->getDispatcher();
@@ -125,15 +118,16 @@ class PubMedExportPlugin extends ImportExportPlugin {
 	}
 
 	function exportSubmissions($submissionIds, $context, $user) {
-		$submissionDao = DAORegistry::getDAO('SubmissionDAO'); /* @var $submissionDao SubmissionDAO */
-		$filterDao = DAORegistry::getDAO('FilterDAO'); /* @var $filterDao FilterDAO */
+		$submissionDao = Application::getSubmissionDAO();
+		$xml = '';
+		$filterDao = DAORegistry::getDAO('FilterDAO');
 		$pubmedExportFilters = $filterDao->getObjectsByGroup('article=>pubmed-xml');
 		assert(count($pubmedExportFilters) == 1); // Assert only a single serialization filter
 		$exportFilter = array_shift($pubmedExportFilters);
 		$submissions = array();
 		foreach ($submissionIds as $submissionId) {
-			$submission = $submissionDao->getById($submissionId);
-			if ($submission && $submission->getData('contextId') == $context->getId()) $submissions[] = $submission;
+			$submission = $submissionDao->getById($submissionId, $context->getId());
+			if ($submission) $submissions[] = $submission;
 		}
 		libxml_use_internal_errors(true);
 		$submissionXml = $exportFilter->execute($submissions, true);
@@ -142,7 +136,12 @@ class PubMedExportPlugin extends ImportExportPlugin {
 			return $a->level == LIBXML_ERR_ERROR || $a->level == LIBXML_ERR_FATAL;
 		});
 		if (!empty($errors)) {
+			$charset = Config::getVar('i18n', 'client_charset');
+			header('Content-type: text/html; charset=' . $charset);
+			echo '<html><body>';
 			$this->displayXMLValidationErrors($errors, $xml);
+			echo '</body></html>';
+			fatalError(__('plugins.importexport.common.error.validation'));
 		}
 		return $xml;
 	}
@@ -155,22 +154,40 @@ class PubMedExportPlugin extends ImportExportPlugin {
 	 * @return string XML contents representing the supplied issue IDs.
 	 */
 	function exportIssues($issueIds, $context, $user) {
-		$filterDao = DAORegistry::getDAO('FilterDAO'); /* @var $filterDao FilterDAO */
+		$issueDao = DAORegistry::getDAO('IssueDAO');
+		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
+		$submissionIds = array();
+		foreach ($issueIds as $issueId) {
+			$publishedArticles = $publishedArticleDao->getPublishedArticles($issueId);
+			foreach ($publishedArticles as $publishedArticle) {
+				$submissionIds[] = $publishedArticle->getId();
+			}
+		}
+
+		$submissionDao = Application::getSubmissionDAO();
+		$xml = '';
+		$filterDao = DAORegistry::getDAO('FilterDAO');
 		$pubmedExportFilters = $filterDao->getObjectsByGroup('article=>pubmed-xml');
 		assert(count($pubmedExportFilters) == 1); // Assert only a single serialization filter
 		$exportFilter = array_shift($pubmedExportFilters);
-		$submissionsIterator = Services::get('submission')->getMany([
-			'contextId' => $context->getId(),
-			'issueIds' => $issueIds,
-		]);
+		$submissions = array();
+		foreach ($submissionIds as $submissionId) {
+			$submission = $submissionDao->getById($submissionId, $context->getId());
+			if ($submission) $submissions[] = $submission;
+		}
 		libxml_use_internal_errors(true);
-		$submissionXml = $exportFilter->execute(iterator_to_array($submissionsIterator), true);
+		$submissionXml = $exportFilter->execute($submissions, true);
 		$xml = $submissionXml->saveXml();
 		$errors = array_filter(libxml_get_errors(), function($a) {
 			return $a->level == LIBXML_ERR_ERROR || $a->level == LIBXML_ERR_FATAL;
 		});
 		if (!empty($errors)) {
+			$charset = Config::getVar('i18n', 'client_charset');
+			header('Content-type: text/html; charset=' . $charset);
+			echo '<html><body>';
 			$this->displayXMLValidationErrors($errors, $xml);
+			echo '</body></html>';
+			fatalError(__('plugins.importexport.common.error.validation'));
 		}
 		return $xml;
 	}
@@ -184,8 +201,11 @@ class PubMedExportPlugin extends ImportExportPlugin {
 		$xmlFile = array_shift($args);
 		$journalPath = array_shift($args);
 
-		$journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
-		$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
+		$journalDao = DAORegistry::getDAO('JournalDAO');
+		$issueDao = DAORegistry::getDAO('IssueDAO');
+		$sectionDao = DAORegistry::getDAO('SectionDAO');
+		$userDao = DAORegistry::getDAO('UserDAO');
+		$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
 
 		$journal = $journalDao->getByPath($journalPath);
 
@@ -237,4 +257,4 @@ class PubMedExportPlugin extends ImportExportPlugin {
 	}
 }
 
-
+?>

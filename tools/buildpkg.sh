@@ -3,9 +3,9 @@
 #
 # tools/buildpkg.sh
 #
-# Copyright (c) 2014-2020 Simon Fraser University
-# Copyright (c) 2003-2020 John Willinsky
-# Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+# Copyright (c) 2014-2018 Simon Fraser University
+# Copyright (c) 2003-2018 John Willinsky
+# Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
 #
 # Script to create an OJS package for distribution.
 #
@@ -26,29 +26,51 @@ PREFIX=ojs
 BUILD=$PREFIX-$VERSION
 TMPDIR=`mktemp -d $PREFIX.XXXXXX` || exit 1
 
-EXCLUDE="docs/dev									\
+EXCLUDE="dbscripts/xml/data/locale/en_US/sample.xml					\
+dbscripts/xml/data/sample.xml								\
+docs/dev										\
 tests											\
 tools/buildpkg.sh									\
-cypress											\
-lib/pkp/cypress										\
+tools/genLocaleReport.sh								\
+tools/genTestLocale.php									\
 tools/test										\
 lib/pkp/tools/travis									\
 lib/pkp/plugins/*/*/tests								\
 plugins/*/*/tests									\
 plugins/auth/ldap									\
+plugins/generic/announcementFeed							\
+plugins/generic/backup									\
+plugins/generic/browse									\
+plugins/generic/coins									\
+plugins/generic/cookiesAlert								\
+plugins/generic/counter									\
+plugins/generic/customLocale								\
+plugins/generic/externalFeed								\
+plugins/generic/lucene									\
+plugins/generic/phpMyVisites								\
+plugins/generic/recommendBySimilarity							\
+plugins/generic/translator								\
 plugins/importexport/sample								\
 plugins/importexport/duracloud								\
+plugins/reports/subscriptions								\
+plugins/blocks/relatedItems								\
+tests											\
 lib/pkp/tests										\
 .git											\
 .openshift										\
 .scrutinizer.yml									\
 .travis.yml										\
 lib/pkp/.git										\
-lib/pkp/lib/vendor/smarty/smarty/demo							\
+lib/pkp/lib/components/*.js								\
+lib/pkp/lib/components/*.css								\
+lib/pkp/js/lib/pnotify/build-tools							\
 lib/pkp/lib/vendor/alex198710/pnotify/.git						\
 lib/pkp/lib/vendor/sebastian								\
 lib/pkp/lib/vendor/oyejorge/less.php/test						\
 lib/pkp/tools/travis									\
+lib/pkp/lib/swordappv2/.git								\
+lib/pkp/lib/swordappv2/.git								\
+lib/pkp/lib/swordappv2/test								\
 plugins/paymethod/paypal/vendor/omnipay/common/tests/					\
 plugins/paymethod/paypal/vendor/omnipay/paypal/tests/					\
 plugins/paymethod/paypal/vendor/guzzle/guzzle/docs/					\
@@ -56,6 +78,7 @@ plugins/paymethod/paypal/vendor/guzzle/guzzle/tests/					\
 plugins/generic/citationStyleLanguage/lib/vendor/symfony/debug/				\
 plugins/generic/citationStyleLanguage/lib/vendor/symfony/console/Tests/			\
 plugins/paymethod/paypal/vendor/symfony/http-foundation/Tests/				\
+plugins/paymethod/paypal/vendor/symfony/event-dispatcher/				\
 plugins/generic/citationStyleLanguage/lib/vendor/symfony/filesystem/Tests/		\
 plugins/generic/citationStyleLanguage/lib/vendor/symfony/stopwatch/Tests/		\
 plugins/generic/citationStyleLanguage/lib/vendor/symfony/event-dispatcher/Tests/	\
@@ -68,8 +91,6 @@ lib/pkp/lib/vendor/symfony/translation/Tests/						\
 lib/pkp/lib/vendor/symfony/process/Tests/						\
 lib/pkp/lib/vendor/pimple/pimple/src/Pimple/Tests/					\
 lib/pkp/lib/vendor/robloach/component-installer/tests/ComponentInstaller/Test/		\
-lib/pkp/lib/vendor/michelf/php-markdown/test						\
-lib/pkp/lib/vendor/adodb/adodb-php/.git							\
 plugins/generic/citationStyleLanguage/lib/vendor/satooshi/php-coveralls/tests/		\
 plugins/generic/citationStyleLanguage/lib/vendor/guzzle/guzzle/tests/			\
 plugins/generic/citationStyleLanguage/lib/vendor/seboettg/collection/tests/		\
@@ -81,11 +102,13 @@ lib/pkp/lib/vendor/pimple/pimple/ext/pimple/tests/					\
 lib/pkp/lib/vendor/robloach/component-installer/tests/					\
 lib/pkp/lib/vendor/phpmailer/phpmailer/test/						\
 node_modules										\
+.babelrc										\
 .editorconfig										\
-babel.config.js										\
-package-lock.json									\
+.eslintignore										\
+.eslintrc.js										\
+.postcssrc.js										\
 package.json										\
-vue.config.js										\
+webpack.config.js									\
 lib/ui-library"
 
 
@@ -103,15 +126,21 @@ echo "Done"
 
 echo "Installing composer dependencies:"
 echo -n " - lib/pkp ... "
-composer.phar --working-dir=lib/pkp install --no-dev
+cd lib/pkp
+composer.phar update --no-dev
+cd ../..
 echo "Done"
 
 echo -n " - plugins/paymethod/paypal ... "
-composer.phar --working-dir=plugins/paymethod/paypal install --no-dev
+cd plugins/paymethod/paypal
+composer.phar install --no-dev
+cd ../../..
 echo "Done"
 
 echo -n " - plugins/generic/citationStyleLanguage ... "
-composer.phar --working-dir=plugins/generic/citationStyleLanguage install --no-dev
+cd plugins/generic/citationStyleLanguage
+composer.phar install --no-dev
+cd ../../..
 echo "Done"
 
 echo -n "Installing node dependencies... "

@@ -3,9 +3,9 @@
 /**
  * @file plugins/paymethod/manual/ManualPaymentPlugin.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class ManualPaymentPlugin
  * @ingroup plugins_paymethod_manual
@@ -44,50 +44,20 @@ class ManualPaymentPlugin extends PaymethodPlugin {
 	function register($category, $path, $mainContextId = null) {
 		if (parent::register($category, $path, $mainContextId)) {
 			$this->addLocaleData();
-			\HookRegistry::register('Form::config::before', array($this, 'addSettings'));
+			if ($this->getEnabled($mainContextId)) {
+				$this->_registerTemplateResource();
+			}
 			return true;
 		}
 		return false;
 	}
 
 	/**
-	 * Add settings to the payments form
-	 *
-	 * @param $hookName string
-	 * @param $form FormComponent
+	 * @copydoc PaymethodPlugin::getSettingsForm()
 	 */
-	public function addSettings($hookName, $form) {
-		if ($form->id !== FORM_PAYMENT_SETTINGS) {
-			return;
-		}
-
-		$context = Application::get()->getRequest()->getContext();
-		if (!$context) {
-			return;
-		}
-
-		$form->addGroup([
-				'id' => 'manualPayment',
-				'label' => __('plugins.paymethod.manual.displayName'),
-				'showWhen' => 'paymentsEnabled',
-			])
-			->addField(new \PKP\components\forms\FieldTextArea('manualInstructions', [
-				'label' => __('plugins.paymethod.manual.settings'),
-				'value' => $this->getSetting($context->getId(), 'manualInstructions'),
-				'groupId' => 'manualPayment',
-			]));
-
-		return;
-	}
-
-	/**
-	 * @copydoc PaymethodPlugin::saveSettings()
-	 */
-	public function saveSettings($params, $slimRequest, $request) {
-		$allParams = $slimRequest->getParsedBody();
-		$manualInstructions = isset($allParams['manualInstructions']) ? (string) $allParams['manualInstructions'] : '';
-		$this->updateSetting($request->getContext()->getId(), 'manualInstructions', $manualInstructions);
-		return [];
+	function getSettingsForm($context) {
+		$this->import('ManualPaymentSettingsForm');
+		return new ManualPaymentSettingsForm($this, $context->getId());
 	}
 
 	/**
@@ -108,7 +78,7 @@ class ManualPaymentPlugin extends PaymethodPlugin {
 		AppLocale::requireComponents(LOCALE_COMPONENT_APP_COMMON);
 
 		import('lib.pkp.classes.form.Form');
-		$paymentForm = new Form($this->getTemplateResource('paymentForm.tpl'));
+		$paymentForm = new Form($this->getTemplatePath() . 'paymentForm.tpl');
 		$paymentManager = Application::getPaymentManager($context);
 		$paymentForm->setData(array(
 			'itemName' => $paymentManager->getPaymentName($queuedPayment),
@@ -132,7 +102,7 @@ class ManualPaymentPlugin extends PaymethodPlugin {
 		$op = isset($args[0])?$args[0]:null;
 		$queuedPaymentId = isset($args[1])?((int) $args[1]):0;
 
-		$queuedPaymentDao = DAORegistry::getDAO('QueuedPaymentDAO'); /* @var $queuedPaymentDao QueuedPaymentDAO */
+		$queuedPaymentDao = DAORegistry::getDAO('QueuedPaymentDAO');
 		$queuedPayment = $queuedPaymentDao->getById($queuedPaymentId);
 		$paymentManager = Application::getPaymentManager($context);
 		// if the queued payment doesn't exist, redirect away from payments
@@ -142,8 +112,8 @@ class ManualPaymentPlugin extends PaymethodPlugin {
 			case 'notify':
 				import('lib.pkp.classes.mail.MailTemplate');
 				AppLocale::requireComponents(LOCALE_COMPONENT_APP_COMMON);
-				$contactName = $context->getData('contactName');
-				$contactEmail = $context->getData('contactEmail');
+				$contactName = $context->getSetting('contactName');
+				$contactEmail = $context->getSetting('contactEmail');
 				$mail = new MailTemplate('MANUAL_PAYMENT_NOTIFICATION');
 				$mail->setReplyTo(null);
 				$mail->addRecipient($contactEmail, $contactName);
@@ -175,5 +145,19 @@ class ManualPaymentPlugin extends PaymethodPlugin {
 	 */
 	function getInstallEmailTemplatesFile() {
 		return ($this->getPluginPath() . DIRECTORY_SEPARATOR . 'emailTemplates.xml');
+	}
+
+	/**
+	 * @copydoc Plugin::getInstallEmailTemplateDataFile
+	 */
+	function getInstallEmailTemplateDataFile() {
+		return ($this->getPluginPath() . '/locale/{$installedLocale}/emailTemplates.xml');
+	}
+
+	/**
+	 * @copydoc Plugin::getTemplatePath()
+	 */
+	function getTemplatePath($inCore = false) {
+		return parent::getTemplatePath($inCore) . 'templates/';
 	}
 }

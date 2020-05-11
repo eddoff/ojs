@@ -3,9 +3,9 @@
 /**
  * @file classes/issue/IssueGalleyDAO.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class IssueGalleyDAO
  * @ingroup issue_galley
@@ -159,41 +159,16 @@ class IssueGalleyDAO extends DAO {
 	}
 
 	/**
-	 * Retrieve issue galley by urlPath or, failing that,
-	 * internal galley ID; urlPath takes precedence.
+	 * Retrieve issue galley by public galley id or, failing that,
+	 * internal galley ID; public galley ID takes precedence.
 	 * @param $galleyId string
 	 * @param $issueId int
-	 * @return IssueGalley object
+	 * @return ArticleGalley object
 	 */
 	function getByBestId($galleyId, $issueId) {
-		$result = $this->retrieve(
-			'SELECT
-				g.*,
-				f.file_name,
-				f.original_file_name,
-				f.file_type,
-				f.file_size,
-				f.content_type,
-				f.date_uploaded,
-				f.date_modified
-			FROM issue_galleys g
-				LEFT JOIN issue_files f ON (g.file_id = f.file_id)
-			WHERE	g.url_path = ? AND
-				g.issue_id = ?',
-			[
-				$galleyId,
-				(int) $issueId,
-			]
-		);
-
-		if ($result->RecordCount() != 0) {
-			$issueGalley = $this->_fromRow($result->GetRowAssoc(false));
-		} else {
-			$issueGalley = $this->getById($galleyId, $issueId);
-		}
-		$result->Close();
-
-		return $issueGalley;
+		if ($galleyId != '') $galley =& $this->getByPubId('publisher-id', $galleyId, $issueId);
+		if (!isset($galley) && ctype_digit("$galleyId")) $galley = $this->getById((int) $galleyId, $issueId);
+		return $galley;
 	}
 
 	/**
@@ -248,7 +223,6 @@ class IssueGalleyDAO extends DAO {
 		$galley->setFileId($row['file_id']);
 		$galley->setLabel($row['label']);
 		$galley->setSequence($row['seq']);
-		$galley->setData('urlPath', $row['url_path']);
 
 		// IssueFile set methods
 		$galley->setServerFileName($row['file_name']);
@@ -277,17 +251,15 @@ class IssueGalleyDAO extends DAO {
 				file_id,
 				label,
 				locale,
-				seq,
-				url_path)
+				seq)
 				VALUES
-				(?, ?, ?, ?, ?, ?)',
+				(?, ?, ?, ?, ?)',
 			array(
 				(int) $galley->getIssueId(),
 				(int) $galley->getFileId(),
 				$galley->getLabel(),
 				$galley->getLocale(),
-				$galley->getSequence() == null ? $this->getNextGalleySequence($galley->getIssueId()) : $galley->getSequence(),
-				$galley->getData('urlPath'),
+				$galley->getSequence() == null ? $this->getNextGalleySequence($galley->getIssueId()) : $galley->getSequence()
 			)
 		);
 		$galley->setId($this->getInsertId());
@@ -309,15 +281,13 @@ class IssueGalleyDAO extends DAO {
 					file_id = ?,
 					label = ?,
 					locale = ?,
-					seq = ?,
-					url_path = ?
+					seq = ?
 				WHERE galley_id = ?',
 			array(
 				(int) $galley->getFileId(),
 				$galley->getLabel(),
 				$galley->getLocale(),
 				$galley->getSequence(),
-				$galley->getData('urlPath'),
 				(int) $galley->getId()
 			)
 		);
@@ -413,4 +383,4 @@ class IssueGalleyDAO extends DAO {
 	}
 }
 
-
+?>

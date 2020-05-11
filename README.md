@@ -15,11 +15,19 @@ Checkout submodules and copy default configuration :
     git submodule update --init --recursive
     cp config.TEMPLATE.inc.php config.inc.php
 
-Install or update dependencies via Composer (https://getcomposer.org/):
+Install or update dependencies via Composer:
 
-    composer --working-dir=lib/pkp update
-    composer --working-dir=plugins/paymethod/paypal update
-    composer --working-dir=plugins/generic/citationStyleLanguage update
+    # if you don't already have Composer installed:
+    curl -sS https://getcomposer.org/installer | php
+    cd lib/pkp
+    php ../../composer.phar update
+    cd ../..
+    cd plugins/paymethod/paypal
+    php ../../../composer.phar update
+    cd ../../..
+    cd plugins/generic/citationStyleLanguage
+    php ../../../composer.phar update
+    cd ../../..
 
 Install or update dependencies via [NPM](https://www.npmjs.com/):
 
@@ -31,17 +39,17 @@ If your PHP version supports built-in development server :
 
     php -S localhost:8000
 
-See the [Documentation Hub][doc-hub] for a more complete development guide.
+See [Wiki][wiki-dev] for more complete development guide.
 
 ## Running Tests
 
 We recommend using [Travis](https://travis-ci.org/) for continuous-integration
-based testing. Review the Travis configuration file (`.travis.yml`) as a
+based testing. Review the Travis configuration file (.travis.yml) as a
 reference for running the test locally, should you choose to do so.
 
 The tests include an integration test suite that builds a data environment from
-scratch, including the installation process. (This is the `-b` flag to the test
-script `lib/pkp/tools/runAllTests.sh`; this is also executed in the Travis
+scratch, including the installation process. (This is the "-b" flag to the test
+script lib/pkp/tools/runAllTests.sh; this is also executed in the Travis
 environment.)
 
 ## Bugs / Issues
@@ -59,8 +67,8 @@ Third parties are welcome to modify and redistribute OJS in entirety or parts
 according to the terms of this license. PKP also welcomes patches for
 improvements or bug fixes to the software.
 
-[pkp]: https://pkp.sfu.ca/
-[readme]: docs/README.md
-[doc-hub]: https://docs.pkp.sfu.ca/
-[php-unit]: https://phpunit.de/
+[pkp]: http://pkp.sfu.ca/
+[readme]: docs/README
+[wiki-dev]: http://pkp.sfu.ca/wiki/index.php/HOW-TO_check_out_PKP_applications_from_git
+[php-unit]: http://phpunit.de/
 [gpl-licence]: docs/COPYING

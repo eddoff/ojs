@@ -3,9 +3,9 @@
 /**
  * @file plugins/importexport/datacite/DataciteExportPlugin.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class DataciteExportPlugin
  * @ingroup plugins_importexport_datacite
@@ -126,13 +126,13 @@ class DataciteExportPlugin extends DOIPubIdExportPlugin {
 					$this->_tarFiles($this->getExportPath(), $finalExportFileName, $exportedFiles);
 					// remove files
 					foreach ($exportedFiles as $exportedFile) {
-						$fileManager->deleteByPath($exportedFile);
+						$fileManager->deleteFile($exportedFile);
 					}
 				} else {
 					$finalExportFileName = array_shift($exportedFiles);
 				}
-				$fileManager->downloadByPath($finalExportFileName);
-				$fileManager->deleteByPath($finalExportFileName);
+				$fileManager->downloadFile($finalExportFileName);
+				$fileManager->deleteFile($finalExportFileName);
 			} else {
 				if (is_array($result)) {
 					foreach($result as $error) {
@@ -164,7 +164,7 @@ class DataciteExportPlugin extends DOIPubIdExportPlugin {
 					$resultErrors[] = $result;
 				}
 				// Remove all temporary files.
-				$fileManager->deleteByPath($exportFileName);
+				$fileManager->deleteFile($exportFileName);
 			}
 			// send notifications
 			if (empty($resultErrors)) {
@@ -197,7 +197,7 @@ class DataciteExportPlugin extends DOIPubIdExportPlugin {
 	 * @copydoc PubObjectsExportPlugin::depositXML()
 	 */
 	function depositXML($object, $context, $filename) {
-		$request = Application::get()->getRequest();
+		$request = $this->getRequest();
 		// Get the DOI and the URL for the object.
 		$doi = $object->getStoredPubId('doi');
 		assert(!empty($doi));
@@ -304,9 +304,9 @@ class DataciteExportPlugin extends DOIPubIdExportPlugin {
 					}
 					$fileManager->copyFile($finalExportFileName, $outputFile);
 					foreach ($exportedFiles as $exportedFile) {
-						$fileManager->deleteByPath($exportedFile);
+						$fileManager->deleteFile($exportedFile);
 					}
-					$fileManager->deleteByPath($finalExportFileName);
+					$fileManager->deleteFile($finalExportFileName);
 				} else {
 					echo __('plugins.importexport.common.cliError') . "\n";
 					echo __('manager.plugins.tarCommandNotFound') . "\n\n";
@@ -329,7 +329,7 @@ class DataciteExportPlugin extends DOIPubIdExportPlugin {
 						$resultErrors[] = $result;
 					}
 					// Remove all temporary files.
-					$fileManager->deleteByPath($exportFileName);
+					$fileManager->deleteFile($exportFileName);
 				}
 				if (empty($resultErrors)) {
 					echo __('plugins.importexport.common.register.success') . "\n";
@@ -395,7 +395,7 @@ class DataciteExportPlugin extends DOIPubIdExportPlugin {
 	 * Get the canonical URL of an object.
 	 * @param $request Request
 	 * @param $context Context
-	 * @param $object Issue|Submission|ArticleGalley
+	 * @param $object Issue|PublishedArticle|ArticleGalley
 	 */
 	function _getObjectUrl($request, $context, $object) {
 		$router = $request->getRouter();
@@ -406,20 +406,21 @@ class DataciteExportPlugin extends DOIPubIdExportPlugin {
 			if ($cache->isCached('articles', $articleId)) {
 				$article = $cache->get('articles', $articleId);
 			} else {
-				$article = Services::get('submission')->get($articleId);
+				$articleDao = DAORegistry::getDAO('PublishedArticleDAO'); /* @var $articleDao PublishedArticleDAO */
+				$article = $articleDao->getByArticleId($articleId, $context->getId(), true);
 			}
-			assert(is_a($article, 'Submission'));
+			assert(is_a($article, 'PublishedArticle'));
 		}
 		$url = null;
 		switch (true) {
 			case is_a($object, 'Issue'):
 				$url = $router->url($request, $context->getPath(), 'issue', 'view', $object->getBestIssueId(), null, null, true);
 				break;
-			case is_a($object, 'Submission'):
-				$url = $router->url($request, $context->getPath(), 'article', 'view', $object->getBestId(), null, null, true);
+			case is_a($object, 'PublishedArticle'):
+				$url = $router->url($request, $context->getPath(), 'article', 'view', $object->getBestArticleId(), null, null, true);
 				break;
 			case is_a($object, 'ArticleGalley'):
-				$url = $router->url($request, $context->getPath(), 'article', 'view', array($article->getBestId(), $object->getBestGalleyId()), null, null, true);
+				$url = $router->url($request, $context->getPath(), 'article', 'view', array($article->getBestArticleId(), $object->getBestGalleyId()), null, null, true);
 				break;
 		}
 		if ($this->isTestMode($context)) {
@@ -431,4 +432,4 @@ class DataciteExportPlugin extends DOIPubIdExportPlugin {
 
 }
 
-
+?>

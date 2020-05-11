@@ -3,9 +3,9 @@
 /**
  * @file controllers/grid/settings/plugins/SettingsPluginGridHandler.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2003-2020 John Willinsky
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class SettingsPluginGridHandler
  * @ingroup controllers_grid_settings_plugins
@@ -30,9 +30,9 @@ class SettingsPluginGridHandler extends PluginGridHandler {
 	// Extended methods from PluginGridHandler
 	//
 	/**
-	 * @copydoc PluginGridHandler::loadCategoryData()
+	 * @copydoc PluginGridHandler::loadData()
 	 */
-	function loadCategoryData($request, &$categoryDataElement, $filter = null) {
+	function loadCategoryData($request, $categoryDataElement, $filter) {
 		$plugins = parent::loadCategoryData($request, $categoryDataElement, $filter);
 		$userRoles = $this->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
 
@@ -93,4 +93,4 @@ class SettingsPluginGridHandler extends PluginGridHandler {
 	}
 }
 
-
+?>
